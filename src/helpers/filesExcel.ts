@@ -129,7 +129,10 @@ const storage = multer.memoryStorage();
       }
 
       const worksheet = workbook.getWorksheet(1); // Obtener la primera hoja del libro
-      const headers = worksheet?.getRow(rowHeader).values as string[]; // Obtener encabezados
+      const preheaders = worksheet?.getRow(rowHeader).values as string[]; // Obtener encabezados
+      const headers = preheaders
+        .map(s => s.replace(/^#\s*/, ''))  // Elimina '#' y espacios al principio
+        .map(s => s.replace(/ /g, '_'));   // Reemplaza espacios por guiones bajos
       const data: Array<Record<string, any>> = []; // Inicializar array para almacenar datos
 
       console.log('obtuvo los headers')

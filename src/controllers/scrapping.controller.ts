@@ -6,6 +6,9 @@ import { rename, readFileSync } from 'node:fs';
 import puppeteer, { Browser, HTTPResponse, Page } from "puppeteer";
 
 import Excel from "../helpers/filesExcel";
+import ApiResponses from "../helpers/apiResponse";
+import { resStatus } from "../helpers/resStatus";
+import TBPEDIDOSNOVAVENTAModel from "../models/TBPEDIDOSNOVAVENTA.model";
 
 class WebScrapping {
 
@@ -13,7 +16,7 @@ class WebScrapping {
     const {login, password, campaing } = req.body;
 
     try {
-      const browser = await puppeteer.launch({ headless: 'new' }); // headlees esconde el navegador y es lo recomendable por rendimiento
+      const browser = await puppeteer.launch({ headless: false }); // headlees esconde el navegador y es lo recomendable por rendimiento, para verlo cambiarlo a false
       const page = await browser.newPage();
 
       const client = await page.target().createCDPSession();
@@ -39,7 +42,7 @@ class WebScrapping {
         }
       });
       
-      page.on( 'response', (response) => WebScrapping.downloadExcel(response, browser, page, req, res ) ); // escuchando evento de descarga
+      page.on( 'response', (response) => WebScrapping.downloadExcel(response, browser, res ) ); // escuchando evento de descarga
 
 
       // login
@@ -66,14 +69,14 @@ class WebScrapping {
 
       const generateReportButton = await page.waitForSelector('#SqlFields tbody input[type="button"]');
       await generateReportButton?.click();
-      console.log('generando archivo');
+      console.log('Esperando descarga de archivo');
 
     } catch (error) {
       console.error('error durante el scrapping: ', error);
     }
   }
 
-  static async downloadExcel(response: HTTPResponse, browser: Browser, page: Page, req: Request, res:Response ){
+  static async downloadExcel(response: HTTPResponse, browser: Browser, res:Response ){
     const validateExcelPath = (filePath:string) => {
       return new Promise((resolve, reject) => {
         const intervalo = setInterval(() => {
@@ -101,23 +104,46 @@ class WebScrapping {
         browser.close();
         
         setTimeout(() => {
-          this.updateReportDB(req, res);
+          this.updateReportDB( res );
         }, 1000);
       }
     }
   }
 
-  static async updateReportDB(req:Request, res:Response){
+  static async updateReportDB( res:Response){
     console.log('comenzara a leer el archivo');
-    const filePath = path.join( __dirname, '../../temp', "REPORTE GENERAL DE OPERACION.xls" );
-    const newFilePath = path.join( __dirname, '../../temp', "REPORTE-GENERAL-DE-OPERACION.xlsx" );
+    try {
+      const filePath = path.join( __dirname, '../../temp', "REPORTE GENERAL DE OPERACION.xls" );
+      const newFilePath = path.join( __dirname, '../../temp', "REPORTE-GENERAL-DE-OPERACION.xlsx" );
+  
+      const buffer = fs.readFileSync(filePath);
+      const ArrayExcel = await Excel.ExcelToArray( buffer, "xls", 1, 2, filePath, newFilePath );
+      // return res.json({ArrayExcel});
 
-    const buffer = fs.readFileSync(filePath);
-    const data = await Excel.ExcelToArray( buffer, "xls", 1, 2, filePath, newFilePath );
+      if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
+        const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
+          'TB_PEDIDOS_NOVAVENTA', ArrayExcel, 'Numero_Boleta'
+        );
+        if(res){
+          return res.status(200).json({ data: insertUpdateData });
+        }
+        console.log('termino el proceso de insert');
+        return
+      }
+
+      if (res) {
+        return res.status(400).json({message: "algo fallo mira consola"})
+      }
+    } catch (error) {
+      console.log('error: ', error);
+      /* #swagger.responses[500] = { description: 'Error server', schema: { $ref: '#/definitions/unsuccessfully' }} */
+      if (res) {
+        return res.status(resStatus.serverError).json(ApiResponses.unsuccessfully( error ));
+      }
+    }
+
 
     
-    
-    res.status(200).json({data});
   }
 
 }

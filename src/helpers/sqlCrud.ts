@@ -91,6 +91,28 @@ class SqlCrud {
     await connection.query( `INSERT INTO ${tableName} (${keys}) VALUES ?`, [ valuesArray ] );
   };
 
+  /**
+   * Inserta múltiples registros en una tabla de la base de datos.
+   * @param {string} tableName - Nombre de la tabla en la que se realizará la inserción.
+   * @param {Array<object>} dataToInsert - Array de objetos representando los datos a ser insertados o actualizados.
+   * @param {string} uniqueKey - Nombre de la columna que servirá como clave única para determinar la actualización.
+   * @returns {Promise<void>} - Promesa que se resuelve una vez completada la inserción o actualización.
+   */
+  static async insertOrUpdateBulk(tableName: string, dataToInsert: Record<string, any>[], uniqueKey: string): Promise<void> {
+    const columns = Object.keys(dataToInsert[0]);
+    const keys = columns.join(', ');
+
+    const valuesArray = dataToInsert.map(data => Object.values(data));
+    const updateSet = columns
+      .filter(column => column !== uniqueKey) // Excluir la clave única de la actualización
+      .map(column => `${column} = VALUES(${column})`)
+      .join(', '); // Generar la parte SET para la cláusula ON DUPLICATE KEY UPDATE
+  
+    const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
+    const result = await connection.query(query, [valuesArray]);
+    console.log('result: ', result);
+  };
+
 
   /**
    * Actualiza una fila en la tabla especificada con los nuevos valores proporcionados.
