@@ -1,0 +1,410 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.0.1",
+    "title": "webscrapping",
+    "description": "Documentacion del aplicativo <b>webscrapping</b>"
+  },
+  "host": "localhost:4500",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "modulo de auth"
+    },
+    {
+      "name": "example",
+      "description": "modulo de example"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/signup": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "description": "Endpoint to sign in a specific user",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "methodSign": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/signin": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "description": "Endpoint to sign in a specific user",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/example/": {
+      "get": {
+        "tags": [
+          "example"
+        ],
+        "description": "Estoy testiando con este para ver los parametros y respuestas",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Add new user.",
+            "schema": {
+              "$ref": "#/definitions/example"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "202": {
+            "description": "Get a specific user.",
+            "schema": {
+              "$ref": "#/definitions/example"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/example/count": {
+      "get": {
+        "tags": [
+          "example"
+        ],
+        "description": "Endpoint to sign in a specific user",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/example/tasks": {
+      "post": {
+        "tags": [
+          "example"
+        ],
+        "description": "Endpoint to sign in a specific user",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/example/tasks/{id}": {
+      "get": {
+        "tags": [
+          "example"
+        ],
+        "description": "Endpoint to sign in a specific user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "example"
+        ],
+        "description": "Endpoint to sign in a specific user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "example"
+        ],
+        "description": "Endpoint to sign in a specific user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "api_key",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "auth": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "webscrapping@domain.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "jhasyifo"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "example": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "hola mundo"
+        },
+        "lastname": {
+          "type": "string",
+          "example": "intento logrado"
+        },
+        "age": {
+          "type": "number",
+          "example": 30
+        }
+      },
+      "required": [
+        "name",
+        "lastname",
+        "age"
+      ]
+    },
+    "countSuccess": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "example": false
+        },
+        "data": {
+          "type": "number",
+          "example": 3
+        }
+      }
+    },
+    "bulkSuccess": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "example": false
+        },
+        "message": {
+          "type": "string",
+          "example": "Datos Ingresados Con exito"
+        }
+      }
+    },
+    "unsuccessfully": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "SERVER_PROBLEM"
+        },
+        "typeError": {
+          "type": "string",
+          "example": "unkown"
+        }
+      }
+    },
+    "errorMessage": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "error"
+        }
+      }
+    },
+    "unauthorized": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "YOU_DONT_HAVE_UNAUTHORIZED"
+        }
+      }
+    },
+    "updateToken": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "UPDATE_TOKEN"
+        },
+        "token": {
+          "type": "string",
+          "example": "string"
+        }
+      }
+    },
+    "uncompleted": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "INCOMPLETE_INFORMATION"
+        },
+        "missings": {
+          "type": "array",
+          "example": [
+            "list"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
