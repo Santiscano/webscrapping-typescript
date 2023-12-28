@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import path from 'path';
 import fs from 'fs';
-import { rename, readFileSync } from 'node:fs';
 
-import puppeteer, { Browser, HTTPResponse, Page } from "puppeteer";
+import puppeteer, { Browser, HTTPResponse } from "puppeteer";
 
 import Excel from "../helpers/filesExcel";
 import ApiResponses from "../helpers/apiResponse";
@@ -16,7 +15,10 @@ class WebScrapping {
     const {login, password, campaing } = req.body;
 
     try {
-      const browser = await puppeteer.launch({ headless: false }); // headlees esconde el navegador y es lo recomendable por rendimiento, para verlo cambiarlo a false
+      const browser = await puppeteer.launch({ 
+        headless: 'new',
+        args: ['--no-sandbox'],
+      }); // headlees esconde el navegador y es lo recomendable por rendimiento, para verlo cambiarlo a false
       const page = await browser.newPage();
 
       const client = await page.target().createCDPSession();
@@ -42,14 +44,14 @@ class WebScrapping {
         }
       });
       
-      page.on( 'response', (response) => WebScrapping.downloadExcel(response, browser, res ) ); // escuchando evento de descarga
+      page.on( 'response', (response) => WebScrapping.downloadExcel(response, browser, res )); // escuchando evento de descarga
 
 
       // login
       await page.type('input[name="login"]', login);
       await page.type('input[name="password"]', password);
       await page.click('button[type="submit"]');
-      console.log('ingresando al dashboard')
+      console.log('ingresando al dashboard');
 
       // Esperar a que la página se cargue completamente (puedes ajustar el tiempo según tus necesidades)
       const buttonRedirectReporters = await page.waitForSelector('#reportsMenu a');
@@ -141,11 +143,7 @@ class WebScrapping {
         return res.status(resStatus.serverError).json(ApiResponses.unsuccessfully( error ));
       }
     }
-
-
-    
   }
-
 }
 
 export default WebScrapping;
