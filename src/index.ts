@@ -26,5 +26,5 @@ setInterval( () => {
   console.log('re-iniciamos scrapping')
   // @ts-ignore
   WebScrapping.novaventa(req );
-}, 1000 * 60 * 5 ); // cada 5 minutos se ejecuta
+}, 1000 * 60 * 2 ); // cada 5 minutos se ejecuta
 

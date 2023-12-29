@@ -32,8 +32,8 @@ class TBPEDIDOSNOVAVENTAModel {
     return { message: "Datos ingresados correctamente", data: res };
   };
 
-  static async insertOrUpdateTBPEDIDOSNOVAVENTA( table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string ) {
-    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey );
+  static async insertOrUpdateTBPEDIDOSNOVAVENTA( table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [] ) {
+    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFields );
 
     return { message: "Datos ingresados y actualizados correctamente", data: res };
   };

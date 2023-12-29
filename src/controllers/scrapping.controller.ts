@@ -14,6 +14,12 @@ class WebScrapping {
   static async novaventa(req:Request, res:Response) {
     const {login, password, campaing } = req.body;
 
+    // eliminamos archivos
+    const filePath1 = path.join(__dirname, "../../temp", "REPORTE GENERAL DE OPERACION.xls");
+    const filePath2 = path.join(__dirname, "../../temp", "REPORTE-GENERAL-DE-OPERACION.xlsx");
+    if(fs.existsSync(filePath1)) fs.unlinkSync(filePath1);
+    if(fs.existsSync(filePath2)) fs.unlinkSync(filePath2);
+
     try {
       const browser = await puppeteer.launch({ 
         headless: 'new',
@@ -106,28 +112,40 @@ class WebScrapping {
         browser.close();
         
         setTimeout(() => {
+          console.log('leyendo archivo');
           this.updateReportDB( res );
-        }, 1000);
+        }, 3000);
       }
     }
   }
 
   static async updateReportDB( res:Response){
-    console.log('comenzara a leer el archivo');
     try {
       const filePath = path.join( __dirname, '../../temp', "REPORTE GENERAL DE OPERACION.xls" );
       const newFilePath = path.join( __dirname, '../../temp', "REPORTE-GENERAL-DE-OPERACION.xlsx" );
-  
+      
       const buffer = fs.readFileSync(filePath);
       const ArrayExcel = await Excel.ExcelToArray( buffer, "xls", 1, 2, filePath, newFilePath );
-      // return res.json({ArrayExcel});
+      console.log('excel convertido en array');
 
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
+        console.log('iniciamos insert');
         const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
-          'TB_PEDIDOS_NOVAVENTA', ArrayExcel, 'Numero_Boleta'
+          'TB_PEDIDOS_NOVAVENTA_TEST', ArrayExcel, 'Numero_Boleta', ['Ciudad', 'Nombre_destinatatio', 'Plataforma', 'Campaña']
         );
         if(res){
           return res.status(200).json({ data: insertUpdateData });
+        }
+        // eliminamos archivos
+        const filePath1 = path.join(__dirname, "../../temp", "REPORTE GENERAL DE OPERACION.xls");
+        const filePath2 = path.join(__dirname, "../../temp", "REPORTE-GENERAL-DE-OPERACION.xlsx");
+        if(fs.existsSync(filePath1)){
+          fs.unlinkSync(filePath1);
+          console.log('archivo 1 eliminado');
+        }
+        if(fs.existsSync(filePath2)){
+          fs.unlinkSync(filePath2);
+          console.log('archivo 2 eliminado');
         }
         console.log('termino el proceso de insert');
         return
