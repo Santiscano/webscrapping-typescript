@@ -20,12 +20,13 @@ class ValidateToken {
     try {
       const token = req.headers.authorization?.split(" ")[1];
       const verify = JWT.verifyToken(token);
+      // @ts-ignore
       if(verify.name === "JsonWebTokenError"){
         return res.status(resStatus.unauthorized).json(ApiResponses.unauthorized())
       }
       return next();
     } catch (error) {
-      return res.status(resStatus.serverError).json(ApiResponses.serverError())
+      return res.status(resStatus.serverError).json(ApiResponses.unsuccessfully(error))
     }
   }
 }
