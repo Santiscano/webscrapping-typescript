@@ -131,7 +131,7 @@ class WebScrapping {
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
         console.log('iniciamos insert');
         const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
-          'TB_PEDIDOS_NOVAVENTA_TEST', ArrayExcel, 'Numero_Boleta', ['Ciudad', 'Nombre_destinatatio', 'Plataforma', 'Campaña']
+          'TB_PEDIDOS_NOVAVENTA', ArrayExcel, 'Numero_Boleta', [ 'Ciudad' ]
         );
         if(res){
           return res.status(200).json({ data: insertUpdateData });
