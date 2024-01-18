@@ -1,4 +1,4 @@
-import { connection } from '../config/database/mysql';
+import { connection, connectionCristianBD } from '../config/database/mysql';
 import SQLResponse from '../interfaces/sql2';
 
 interface getTable {
@@ -114,6 +114,23 @@ class SqlCrud {
     const result = await connection.query(query, [valuesArray]);
     console.log('result: ', result);
   };
+
+  static async insertOrUpdateBulkCristianDB(tableName: string, dataToInsert: Record<string, any>[], uniqueKey: string, excludeFields: string[] = []): Promise<void> {
+    console.log( 'lenght data: ', dataToInsert.length );
+    const columns = Object.keys(dataToInsert[0]);
+    const keys = columns.join(', ');
+
+    const valuesArray = dataToInsert.map(data => Object.values(data));
+    const updateSet = columns
+      .filter(column => column !== uniqueKey && !excludeFields.includes(column)) // Excluir las claves que no se actualizaran
+      .map(column => `${column} = VALUES(${column})`)
+      .join(', '); // Generar la parte SET para la cláusula ON DUPLICATE KEY UPDATE 341464
+  
+    const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
+    console.log('query: ', query);
+    const resultCristian = await connectionCristianBD.query(query, [valuesArray]);
+    console.log('resultCristian: ', resultCristian);
+  }
 
 
   /**

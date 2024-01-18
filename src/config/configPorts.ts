@@ -12,6 +12,13 @@ export const DB_DATABASE = process.env.DB_DB || "nombre_base_de_datos";
 export const DB_PORT = process.env.DB_PORT || 3306;
 export const DB_PASSWORD = process.env.DB_PASSWORD || "contraseña_db";
 
+// BASE DE DATOS ESPEJO CRISTIAN
+export const E_CONTROL_REPORT_DB_HOST = process.env.E_CONTROL_REPORT_DB_HOST;
+export const E_CONTROL_REPORT_DB_USER = process.env.E_CONTROL_REPORT_DB_USER;
+export const E_CONTROL_REPORT_DB_DATABASE = process.env.E_CONTROL_REPORT_DB_DATABASE;
+export const E_CONTROL_REPORT_DB_PORT = process.env.E_CONTROL_REPORT_DB_PORT;
+export const E_CONTROL_REPORT_DB_PASSWORD = process.env.E_CONTROL_REPORT_DB_PASSWORD;
+
 // BASE DE DATOS MONGOOSE
 export const MONGODB_URI = process.env.MONGODB_URI;
 
