@@ -15,7 +15,7 @@ const req = {
   body: {
     login: "admin@SOLUCIONES.com", 
     password: "Admin@SOLUCIONES.com", 
-    campaing: "202401"
+    campaing: "202402"
   }
 };
 
@@ -23,7 +23,7 @@ console.log('scrapping inicial');
 // @ts-ignore
 WebScrapping.novaventa(req );
 setInterval( () => {
-  console.log('re-iniciamos scrapping')
+  console.log(`re-iniciamos scrapping con campaña: ${req.body.campaing}`)
   // @ts-ignore
   WebScrapping.novaventa(req );
 }, 1000 * 60 * 5 ); // cada 5 minutos se ejecuta
