@@ -15,9 +15,9 @@ export const connection = mysql.createPool({
 })
 
 export const connectionCristianBD = mysql.createPool({
-  host: "62.72.8.157",
-  user: "remoto-control",
-  database: "e-control",
-  port: 8443,
-  password: "ZlC4QTqZdS19azWXQB5c----",
+  host: E_CONTROL_REPORT_DB_HOST,
+  user: E_CONTROL_REPORT_DB_USER,
+  database: E_CONTROL_REPORT_DB_DATABASE,
+  port: Number(E_CONTROL_REPORT_DB_PORT),
+  password: E_CONTROL_REPORT_DB_PASSWORD,
 })

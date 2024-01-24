@@ -100,7 +100,7 @@ class SqlCrud {
    * @returns {Promise<void>} - Promesa que se resuelve una vez completada la inserción o actualización.
    */
   static async insertOrUpdateBulk(tableName: string, dataToInsert: Record<string, any>[], uniqueKey: string, excludeFields: string[] = []): Promise<void> {
-    console.log( 'lenght data: ', dataToInsert.length );
+    console.log( 'lenght data: ', dataToInsert.length, 'e insertando a e-control-pl-cali' );
     const columns = Object.keys(dataToInsert[0]);
     const keys = columns.join(', ');
 
@@ -112,11 +112,11 @@ class SqlCrud {
   
     const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
     const result = await connection.query(query, [valuesArray]);
-    console.log('result: ', result);
+    console.log('result database 1: ', result);
   };
 
   static async insertOrUpdateBulkCristianDB(tableName: string, dataToInsert: Record<string, any>[], uniqueKey: string, excludeFields: string[] = []): Promise<void> {
-    console.log( 'lenght data: ', dataToInsert.length );
+    console.log( 'lenght data: ', dataToInsert.length, 'e insertando a e-control ti' );
     const columns = Object.keys(dataToInsert[0]);
     const keys = columns.join(', ');
 
@@ -127,7 +127,6 @@ class SqlCrud {
       .join(', '); // Generar la parte SET para la cláusula ON DUPLICATE KEY UPDATE 341464
   
     const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
-    console.log('query: ', query);
     const resultCristian = await connectionCristianBD.query(query, [valuesArray]);
     console.log('resultCristian: ', resultCristian);
   }

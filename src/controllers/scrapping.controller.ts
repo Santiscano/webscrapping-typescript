@@ -22,7 +22,7 @@ class WebScrapping {
 
     try {
       const browser = await puppeteer.launch({ 
-        headless: 'new',
+        headless: "new",
         args: ['--no-sandbox'],
       }); // headlees esconde el navegador y es lo recomendable por rendimiento, para verlo cambiarlo a false
       const page = await browser.newPage();

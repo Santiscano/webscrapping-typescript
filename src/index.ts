@@ -15,11 +15,11 @@ const req = {
   body: {
     login: "admin@SOLUCIONES.com", 
     password: "Admin@SOLUCIONES.com", 
-    campaing: "202403"
+    campaing: "202402"
   }
 };
 
-console.log('scrapping inicial');
+console.log(`scrapping inicial con campaña: ${req.body.campaing}`);
 // @ts-ignore
 WebScrapping.novaventa(req );
 setInterval( () => {
