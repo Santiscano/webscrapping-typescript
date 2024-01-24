@@ -15,7 +15,7 @@ const req = {
   body: {
     login: "admin@SOLUCIONES.com", 
     password: "Admin@SOLUCIONES.com", 
-    campaing: "202402"
+    campaing: "202403"
   }
 };
 
