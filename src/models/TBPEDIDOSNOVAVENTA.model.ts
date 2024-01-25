@@ -34,8 +34,10 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async insertOrUpdateTBPEDIDOSNOVAVENTA( table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [] ) {
     const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFields );
+    console.log('excludeFields: ', excludeFields);
 
     const excludeFieldsCristian = [...excludeFields, "Estado_ans", "Fecha_promesa2", "Estado_promesa" ]
+    console.log('excludeFieldsCristian: ', excludeFieldsCristian);
     const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
 
     return { message: "Datos ingresados y actualizados correctamente", data: { res, resCristian } };
