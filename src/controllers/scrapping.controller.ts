@@ -139,6 +139,8 @@ class WebScrapping {
         // eliminamos archivos
         const filePath1 = path.join(__dirname, "../../temp", "REPORTE GENERAL DE OPERACION.xls");
         const filePath2 = path.join(__dirname, "../../temp", "REPORTE-GENERAL-DE-OPERACION.xlsx");
+        
+        //! elimina los archivos
         if(fs.existsSync(filePath1)){
           fs.unlinkSync(filePath1);
           console.log('archivo 1 eliminado');
@@ -147,7 +149,7 @@ class WebScrapping {
           fs.unlinkSync(filePath2);
           console.log('archivo 2 eliminado');
         }
-        console.log('termino el proceso de insert');
+        console.log(`termino el proceso de insert a las ${Date.now()}`);
         return
       }
 
