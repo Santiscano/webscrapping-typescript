@@ -11,6 +11,16 @@ import TBPEDIDOSNOVAVENTAModel from "../models/TBPEDIDOSNOVAVENTA.model";
 
 class WebScrapping {
 
+  static async updateListCampaing(req: Request, res: Response) {
+    const newCampaing = req.body.newCampaing;
+    const data = await TBPEDIDOSNOVAVENTAModel.updateListCampaingModel(newCampaing)
+    return res.json({
+      msg:"success", 
+      newCampaing,
+      data
+  }) 
+  }
+
   static async novaventa(req:Request, res:Response) {
     const {login, password, campaing } = req.body;
 

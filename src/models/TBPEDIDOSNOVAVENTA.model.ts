@@ -1,8 +1,38 @@
+import fs from 'fs';
+import path from 'path';
+
+
 import SqlCrud from "../helpers/sqlCrud";
 import SQLResponse from "../interfaces/sql2";
 
 
 class TBPEDIDOSNOVAVENTAModel {
+
+  static async updateListCampaingModel(newCampaing:string) {
+
+    const pathFile = path.join(__dirname, '../index.ts');
+    const fileContent = fs.readFileSync( pathFile, 'utf-8');
+    const arrayInitIndex = fileContent.indexOf("[",  fileContent.indexOf('campaing: ') );
+    const arrayEndIndex = fileContent.indexOf("]", fileContent.indexOf('campaing: ') )
+
+    const arrayContent = fileContent.slice(arrayInitIndex, arrayEndIndex + 1);
+    const arrayCampaing = JSON.parse(arrayContent);
+    
+    const uniqueSet = new Set(arrayCampaing);
+    if(!uniqueSet.has(newCampaing)){
+      arrayCampaing.push(newCampaing);
+    }
+    if (arrayCampaing.length > 4) arrayCampaing.shift();
+    const newArrayString = arrayCampaing.map((el:number) => `"${el}"`).join(', ');
+
+    const firstPartContent = fileContent.slice(0, arrayInitIndex)
+    const endPartContent = fileContent.slice(arrayEndIndex + 1)
+    const newContent = `${firstPartContent}[ ${newArrayString} ]${endPartContent}`;
+    console.log('newContent: ', newContent);
+    fs.writeFileSync(pathFile, newContent, 'utf8');
+
+    return arrayCampaing;
+  }
 
   static async getAllTBPEDIDOSNOVAVENTA( table: string, offset:number, limit:number, orderBy:string, sort:string ) {
     return await SqlCrud.getTable( table, offset, limit, orderBy, sort );
