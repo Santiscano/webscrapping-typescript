@@ -12,7 +12,7 @@ import TBPEDIDOSNOVAVENTAModel from "../models/TBPEDIDOSNOVAVENTA.model";
 class WebScrapping {
 
   static async updateListCampaing(req: Request, res: Response) {
-    const newCampaing = req.body.newCampaing;
+    const { newCampaing } = req.body;
     
     const data = await TBPEDIDOSNOVAVENTAModel.updateListCampaingModel(newCampaing)
     return res.json({
@@ -22,8 +22,8 @@ class WebScrapping {
   }) 
   }
 
-  static async multiCampaingsNovaventa() {
-    await TBPEDIDOSNOVAVENTAModel.multiCampaingsNovaventaModel("202304");
+  static async getCampaingsNovaventa() {
+    // await TBPEDIDOSNOVAVENTAModel.getCampaingsNovaventaModel("202304");
   };
 
 }

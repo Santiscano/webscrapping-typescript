@@ -8,16 +8,26 @@ server.serverOn();
 // ======================= bucle para descargar archivo ======================== //
 import WebScrapping from "./models/TBPEDIDOSNOVAVENTA.model";;
 import { requestData as req } from './docs/novaventa';
+import TBPEDIDOSNOVAVENTAModel from './models/TBPEDIDOSNOVAVENTA.model';
 
 let position = 0;
-console.log(`scrapping inicial con campaña: ${req.body.campaings[0]}`);
 
 const runEveryFifteenMinutes = () => {
-  console.log('inicia ejecucion cada 15 min');
+  console.log('start run scrapp to 15 min');
   
-  async function runEveryFourMinutes(){
+  function runEveryFourMinutes(){
     console.log('entro a run every four minutes')
-    await WebScrapping.multiCampaingsNovaventaModel(req.body.campaings[position]);
+    // WebScrapping.getCampaingsNovaventaModel(
+    //   req.body.campaings[position],
+    //   "REPORTE GENERAL DE OPERACION"
+    // );
+    WebScrapping.caliCampaingsNovaventaModel(
+      req.body.campaings[position],
+      "REPORTE GENERAL DE OPERACION SCO CALI"
+    );
+    TBPEDIDOSNOVAVENTAModel.validateNewCampaing();
+
+
     position++
     if(position >= req.body.campaings.length){
       position = 0;
@@ -34,7 +44,7 @@ const runEveryFifteenMinutes = () => {
   setTimeout(() => {
     clearInterval(intervalAction);
     console.log('finalizo todo el ciclo de 15 min')
-  }, 1000 * 60 * 13 ); // finaliza todo al minuto 13
+  }, 1000 * 60 * 14 ); // finaliza todo al minuto 13
 };
 
 // primer llamado
@@ -45,4 +55,6 @@ setInterval( () => {
   runEveryFifteenMinutes();
 }, 1000 * 60 * 15 ); // cada 15 minutos se ejecuta
 
+
+// ==================== bucle de devoluciones =========================== //
 

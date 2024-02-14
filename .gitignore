@@ -29,4 +29,6 @@ dist-ssr
 
 temp/*
 !temp/.gitkeep
+!temp/validate
+!temp/validate/.gitkeep
 keys/*
