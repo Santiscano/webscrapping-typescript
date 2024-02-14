@@ -21,10 +21,10 @@ const runEveryFifteenMinutes = () => {
     //   req.body.campaings[position],
     //   "REPORTE GENERAL DE OPERACION"
     // );
-    WebScrapping.caliCampaingsNovaventaModel(
-      req.body.campaings[position],
-      "REPORTE GENERAL DE OPERACION SCO CALI"
-    );
+    // WebScrapping.caliCampaingsNovaventaModel(
+    //   req.body.campaings[position],
+    //   "REPORTE GENERAL DE OPERACION SCO CALI"
+    // );
     TBPEDIDOSNOVAVENTAModel.validateNewCampaing();
 
 
