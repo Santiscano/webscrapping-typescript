@@ -31,10 +31,10 @@ class RunScrapps {
       this.position = 0
     };
     
-    WebScrapping.getCampaingsNovaventaModel(
-      req.body.campaings[this.position],
-      "REPORTE GENERAL DE OPERACION"
-    );
+    // WebScrapping.getCampaingsNovaventaModel(
+    //   req.body.campaings[this.position],
+    //   "REPORTE GENERAL DE OPERACION"
+    // );
 
     // WebScrapping.caliCampaingsNovaventaModel(
     //   req.body.campaings[this.position],

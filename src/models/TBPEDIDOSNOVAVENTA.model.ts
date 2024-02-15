@@ -42,7 +42,19 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async validateNewCampaing(fileName = "REPORTE GENERAL DE OPERACION") {
     const lastCampaing = requestData.body.campaings[requestData.body.campaings.length - 1];
-    const campaingValidate = Number(lastCampaing) + 1;
+    
+    const lastYear = lastCampaing.substring(0, 4);
+    const nowYear = new Date().getFullYear().toString();
+    
+    let campaingValidate: number;
+    if (lastYear === nowYear) {
+      campaingValidate = Number(lastCampaing) + 1;
+    } else {
+      campaingValidate = Number(`${nowYear}${"01"}`);
+      this.updateListCampaingModel(String(campaingValidate));
+      console.log('Feliz año nuevo: ', campaingValidate);
+    }
+
     const { login, password } = requestData.body;
     let isPageForm = false;
     
