@@ -1,6 +1,5 @@
 import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
 import { requestData as req } from "../docs/novaventa";
-import TBPEDIDOSNOVAVENTAModel from "../models/TBPEDIDOSNOVAVENTA.model";
 
 
 class RunScrapps {
@@ -46,12 +45,6 @@ class RunScrapps {
     //   req.body.campaings[this.position],
     //   "REPORTE GENERAL DE OPERACION SCO CALI"
     // );
-
-    /**
-     * *Este scrapping valida si hay una nueva campaña y si la hay cambia el array de campañas
-     * *ya tiene la validacion para el cambio de año para incrementarlo cuando el año cambia
-     */
-    TBPEDIDOSNOVAVENTAModel.validateNewCampaing();
 
     this.position++;
   };
