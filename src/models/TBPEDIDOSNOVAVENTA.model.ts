@@ -16,7 +16,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async updateListCampaingModel(newCampaing:string) {
 
-    const pathFile = path.join(__dirname, '../docs/novaventa.ts');
+    const pathFile = path.join(__dirname, '../docs/novaventajs.js');
     const fileContent = fs.readFileSync( pathFile, 'utf-8');
     const arrayInitIndex = fileContent.indexOf("[",  fileContent.indexOf('campaing: ') );
     const arrayEndIndex = fileContent.indexOf("]", fileContent.indexOf('campaing: ') )
