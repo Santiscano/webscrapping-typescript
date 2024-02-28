@@ -10,13 +10,16 @@ import ApiResponses from "../helpers/apiResponse";
 import { resStatus } from "../helpers/resStatus";
 import SQLResponse from "../interfaces/sql2";
 import { requestData } from '../docs/novaventa';
+import { ENVIRONMENT } from '../config/configPorts';
 
 class TBPEDIDOSNOVAVENTAModel {
   protected static headless: boolean | "new" | undefined = "new";
 
   static async updateListCampaingModel(newCampaing:string) {
 
-    const pathFile = path.join(__dirname, '../docs/novaventajs.js');
+    const fileToRead = ENVIRONMENT == 'local' ? '../docs/novaventa.ts' : '../docs/novaventa.js'
+
+    const pathFile = path.join(__dirname, fileToRead);
     const fileContent = fs.readFileSync( pathFile, 'utf-8');
     const arrayInitIndex = fileContent.indexOf("[",  fileContent.indexOf('campaing: ') );
     const arrayEndIndex = fileContent.indexOf("]", fileContent.indexOf('campaing: ') )

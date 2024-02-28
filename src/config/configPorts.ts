@@ -19,6 +19,13 @@ export const E_CONTROL_REPORT_DB_DATABASE = process.env.E_CONTROL_REPORT_DB_DATA
 export const E_CONTROL_REPORT_DB_PORT = process.env.E_CONTROL_REPORT_DB_PORT;
 export const E_CONTROL_REPORT_DB_PASSWORD = process.env.E_CONTROL_REPORT_DB_PASSWORD;
 
+// AMBIENTE DE EJECUCION
+export const ENVIRONMENT = process.env.ENVIRONMENT;
+
+
+
+
+
 // BASE DE DATOS MONGOOSE
 export const MONGODB_URI = process.env.MONGODB_URI;
 
