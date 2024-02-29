@@ -11,57 +11,34 @@ import { resStatus } from "../helpers/resStatus";
 import SQLResponse from "../interfaces/sql2";
 import { requestData } from '../docs/novaventa';
 import { ENVIRONMENT } from '../config/configPorts';
+import campaingsModel from './campaings.model';
 
 class TBPEDIDOSNOVAVENTAModel {
   protected static headless: boolean | "new" | undefined = "new";
 
   static async updateListCampaingModel(newCampaing:string) {
-
-    const fileToRead = ENVIRONMENT == 'local' ? '../docs/novaventa.ts' : '../docs/novaventa.js';
-
-    const pathFile = path.join(__dirname, fileToRead);
-    const fileContent = fs.readFileSync( pathFile, 'utf-8');
-    const arrayInitIndex = fileContent.indexOf("[",  fileContent.indexOf('campaing: ') );
-    const arrayEndIndex = fileContent.indexOf("]", fileContent.indexOf('campaing: ') )
-
-    const arrayContent = fileContent.slice(arrayInitIndex, arrayEndIndex + 1);
-    const arrayCampaing = JSON.parse(arrayContent);
+    console.log('entramos a actualizar a nueva campaña: ',  newCampaing);
+    const data = (await campaingsModel.getCampaings()).data[0];
+    console.log('data: ', data);
     
-    const uniqueSet = new Set(arrayCampaing);
-    if(!uniqueSet.has(newCampaing)){
-      arrayCampaing.push(newCampaing);
-    };
-    if (arrayCampaing.length >= 4) arrayCampaing.shift();
-    const newArrayString = arrayCampaing.map((el:number) => `"${el}"`).join(', ');
+    const newData = {
+      SECOND_PREVIOUS_CAMPAING: data.PREVIOUS_CAMPAING,
+      PREVIOUS_CAMPAING: data.CURRENT_CAMPAING,
+      CURRENT_CAMPAING: data.NEW_CAMPAING,
+      NEW_CAMPAING: String(+data.NEW_CAMPAING + 1)
+    }
+    console.log('newData', newData);
 
-    const firstPartContent = fileContent.slice(0, arrayInitIndex)
-    const endPartContent = fileContent.slice(arrayEndIndex + 1)
-    const newContent = `${firstPartContent}[ ${newArrayString} ]${endPartContent}`;
-    console.log('newContent: ', newContent);
-    fs.writeFileSync(pathFile, newContent, 'utf8');
-
-    return arrayCampaing;
+    const resUpdate = await campaingsModel.updatedCampaing(newData);
+    return resUpdate;
   };
 
   static async validateNewCampaing(fileName = "REPORTE GENERAL DE OPERACION") {
-    const lastCampaing = requestData.body.campaings[requestData.body.campaings.length - 1];
+    const campaingValidate = (await campaingsModel.getCampaings()).data[0].NEW_CAMPAING;
+    console.log('campaingValidate: ', campaingValidate);
     
-    const lastYear = lastCampaing.substring(0, 4);
-    const nowYear = new Date().getFullYear().toString();
-    
-    let campaingValidate: number;
-    if (lastYear === nowYear) {
-      campaingValidate = Number(lastCampaing) + 1;
-    } else {
-      campaingValidate = Number(`${nowYear}${"01"}`);
-      this.updateListCampaingModel(String(campaingValidate));
-      console.log('Feliz año nuevo: ', campaingValidate);
-    }
-
     const { login, password } = requestData.body;
     let isPageForm = false;
-    
-    console.log('[INFO]validate new campaing: ', campaingValidate);
 
     // eliminamos archivos
     const filePath1 = path.join(__dirname, "../../temp/validate", `${fileName}.xls`);
@@ -101,7 +78,7 @@ class TBPEDIDOSNOVAVENTAModel {
       });
 
       // escuchando evento de descarga
-      page.on( 'response', (response) => this.validateDownloadExcel(response, browser, fileName, String(campaingValidate)) );
+      page.on( 'response', (response) => this.validateDownloadExcel(response, browser, fileName, campaingValidate) );
       page.on( 'load', () => {
         if (isPageForm) {
           console.log('[SUCCESS]Cerramos browser, porque la pagina cargo despues de ingresar al formulario');

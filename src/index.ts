@@ -22,5 +22,5 @@ setInterval(RunScrapps.runEveryFifteenMinutes, 1000 * 60 * 15); // cada 15 minut
  * *Este scrapping valida si hay una nueva campaña y si la hay cambia el array de campañas
  * *ya tiene la validacion para el cambio de año para incrementarlo cuando el año cambia
 */
-// TBPEDIDOSNOVAVENTAModel.validateNewCampaing();
-// setInterval( TBPEDIDOSNOVAVENTAModel.validateNewCampaing, 1000 * 60 * 30 ) // cada 30 minutos se ejecuta
+TBPEDIDOSNOVAVENTAModel.validateNewCampaing();
+setInterval( TBPEDIDOSNOVAVENTAModel.validateNewCampaing, 1000 * 60 * 30 ) // cada 30 minutos se ejecuta
