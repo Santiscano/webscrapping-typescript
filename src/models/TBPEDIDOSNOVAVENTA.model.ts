@@ -17,7 +17,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async updateListCampaingModel(newCampaing:string) {
 
-    const fileToRead = ENVIRONMENT == 'local' ? '../docs/novaventa.ts' : '../docs/novaventa.js'
+    const fileToRead = ENVIRONMENT == 'local' ? '../docs/novaventa.ts' : '../docs/novaventa.js';
 
     const pathFile = path.join(__dirname, fileToRead);
     const fileContent = fs.readFileSync( pathFile, 'utf-8');
