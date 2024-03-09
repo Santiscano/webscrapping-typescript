@@ -1,8 +1,8 @@
 import "dotenv/config";
 
 // PROTOCOLO DE CONEXION HTTP O HTTPS
-export const PROTOCOL = process.env.PROTOCOL || 'http....';
-export const URL = process.env.URL || "://localhost:....";
+export const PROTOCOL = process.env.PROTOCOL || 'http';
+export const URL = process.env.URL || "://localhost:";
 export const PORT = process.env.PORT || 4600;
 
 // BASES DE DATOS MYSQL

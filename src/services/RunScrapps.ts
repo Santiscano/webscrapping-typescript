@@ -37,6 +37,7 @@ class RunScrapps {
         PREVIOUS_CAMPAING: data.PREVIOUS_CAMPAING,
         CURRENT_CAMPAING: data.CURRENT_CAMPAING
       }
+      console.log('campaingsObj: ', campaingsObj);
       const campaings = Object.values(campaingsObj)
       console.log(`re-iniciamos scrapping con campaña ${campaings[this.position]}`);
 

@@ -33,20 +33,15 @@ export class Server implements ServerInterface{
   constructor(){}
 
   createServer() {
-    const serverProtocol = {
-      http: () => {
-        return http.createServer( this.app );
-      },
-      https: () => {
-        // RUTAS SSL
-        const credentials = {
-          key: fs.readFileSync(`${SSL_PRIVATE_KEY}`, 'utf8'),
-          cert: fs.readFileSync(`${SSL_CERTIFICATE}`, 'utf8')
-        };
-        return https.createServer( credentials, this.app )
-      }
-    }
-    return serverProtocol[this.protocol as Protocol ]();
+    console.log(`servidor corriendo como ${this.protocol}`);
+    if (this.protocol == "http") return http.createServer( this.app );
+
+    // RUTAS SSL
+    const credentials = {
+      key: fs.readFileSync(`${SSL_PRIVATE_KEY}`, 'utf8'),
+      cert: fs.readFileSync(`${SSL_CERTIFICATE}`, 'utf8')
+    };
+    return https.createServer( credentials, this.app );
   }
 
   middlewares(): void {
