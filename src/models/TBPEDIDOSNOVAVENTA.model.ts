@@ -313,7 +313,12 @@ class TBPEDIDOSNOVAVENTAModel {
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
         console.log('iniciamos insert');
         const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
-          'TB_PEDIDOS_NOVAVENTA', ArrayExcel, 'Numero_Boleta', [ 'Ciudad', 'Seccion', 'Zona' ]
+          'TB_PEDIDOS_NOVAVENTA', 
+          ArrayExcel, 
+          'Numero_Boleta', 
+          [
+            'Ciudad', 'Seccion', 'Zona', 'Valor_Venta', 'Factura_De_Venta', 'Fecha_De_Venta'
+          ]
         );
         if(res){
           return res.status(200).json({ data: insertUpdateData });
