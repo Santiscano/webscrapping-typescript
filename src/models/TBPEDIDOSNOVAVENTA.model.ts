@@ -214,7 +214,7 @@ class TBPEDIDOSNOVAVENTAModel {
       await client.send('Page.setDownloadBehavior', {
         behavior: 'allow', 
         downloadPath: path.join(__dirname, '../../temp')
-      }) // esta puerca linea me comio toda la tarde y es la encargada de redireccionar todas las descargas a la carpeta temp
+      }) // esta linea es la encargada de redireccionar todas las descargas a la carpeta temp
 
       await page.goto('https://app.insitusales.com/');
       console.log(`abrimos pagina web`);
@@ -246,16 +246,16 @@ class TBPEDIDOSNOVAVENTAModel {
       await buttonRedirectReporters?.click();
       console.log('ingresando a reportes');
 
-      const buttonRedirecOperation = await page.waitForSelector('#contentLink .support-channels .admin_icons li:nth-child(13) a');
+      const buttonRedirecOperation = await page.waitForSelector('#contentLink .support-channels .admin_icons li:nth-child(12) a');
       await buttonRedirecOperation?.click();
       console.log('ingresando a generar reporte');
 
       const formReporter = await page.waitForSelector('#SqlFields');
       console.log('formulario detectado y registrando');
 
-      await page.type("#param2", "novaventa");
-      await page.select("#param3", "96673");
-      await page.type("#param4", campaing);
+      await page.type("#param2", campaing);
+      // await page.type("#param3", "novaventa");
+      await page.select("#param4", "96673");
 
       const generateReportButton = await page.waitForSelector('#SqlFields tbody input[type="button"]');
       await generateReportButton?.click();
@@ -283,15 +283,15 @@ class TBPEDIDOSNOVAVENTAModel {
     const contentDisposition = response.headers()['content-disposition'];
 
     if ( contentDisposition && contentDisposition.startsWith('attachment') ) {
-      const filename = contentDisposition.split("filename=")[1].trim(); 
-      if (filename == `${fileName}.xls`) {
-        console.log('nombre archivo', filename);
+      const filenameDown = contentDisposition.split("filename=")[1].trim(); 
+      if (filenameDown == `${fileName}.xls`) {
+        console.log('nombre archivo', filenameDown);
         console.log('archivo creado y cerrando navegador');
 
         await this.validateExcelPath(path.join(__dirname, "../../temp", `${fileName}.xls`))
 
-        console.log('browser cerrado con exito');
         browser.close();
+        console.log('browser cerrado con exito');
         
         setTimeout(() => {
           console.log('leyendo archivo');
@@ -312,16 +312,27 @@ class TBPEDIDOSNOVAVENTAModel {
 
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
         console.log('iniciamos insert');
-        const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
-          'TB_PEDIDOS_NOVAVENTA', 
-          ArrayExcel, 
-          'Numero_Boleta', 
-          [
-            'Ciudad', 'Seccion', 'Zona', 'Valor_Venta', 'Factura_De_Venta', 'Fecha_De_Venta'
-          ]
-        );
-        if(res){
-          return res.status(200).json({ data: insertUpdateData });
+
+        if (fileName === "REPORTE GENERAL DE OPERACION") {
+          const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
+            'TB_PEDIDOS_NOVAVENTA', 
+            ArrayExcel, 
+            'Numero_Boleta', 
+            [
+              'Ciudad', 'Seccion', 'Zona', 'Valor_Venta', 'Factura_De_Venta', 'Fecha_De_Venta'
+            ]
+          );
+          if(res){
+            return res.status(200).json({ data: insertUpdateData });
+          }
+        }
+        if (fileName == "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO") {
+          const insertDevolucionesNovaventa = await TBPEDIDOSNOVAVENTAModel.insertorUpdateDevolucionesNovaventa(
+            'TB_DEVOLUCIONES_NOVAVENTA',
+            ArrayExcel,
+            '',
+            []
+          );
         }
         // eliminamos archivos
         const filePath1 = path.join(__dirname, "../../temp", `${fileName}.xls`);
@@ -386,6 +397,13 @@ class TBPEDIDOSNOVAVENTAModel {
 
     return { message: "Datos ingresados y actualizados correctamente", data: { res, resCristian } };
   };
+
+  static async insertorUpdateDevolucionesNovaventa( table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [] ) {
+    const excludeFieldDevoluciones = [ ...excludeFields ];
+    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones );
+
+    return { message: "Da"}
+  }
 
 
 

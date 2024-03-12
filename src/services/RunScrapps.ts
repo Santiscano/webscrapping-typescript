@@ -49,19 +49,19 @@ class RunScrapps {
       /**
        * *Scrapping principal de descarga de archivo de reportes general de operacion
        */
-      WebScrapping.getCampaingsNovaventaModel(
-        campaings[this.position],
-        "REPORTE GENERAL DE OPERACION"
-      );
+      // WebScrapping.getCampaingsNovaventaModel(
+      //   campaings[this.position],
+      //   "REPORTE GENERAL DE OPERACION"
+      // );
   
       /**
-       * *Este scrapp es para la configuracion de devoluciones y ahora esta en espera de confirmar continuacion
+       * *Este scrapp es para la configuracion de devoluciones 
        * !ahora tiene un error porque la base de datos no tiene los datos correctos
        */
-      // WebScrapping.caliCampaingsNovaventaModel(
-      //   campaings[this.position],
-      //   "REPORTE GENERAL DE OPERACION SCO CALI"
-      // );
+      WebScrapping.caliCampaingsNovaventaModel(
+        campaings[this.position],
+        "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO"
+      );
   
       this.position++;
     } catch (error) {
