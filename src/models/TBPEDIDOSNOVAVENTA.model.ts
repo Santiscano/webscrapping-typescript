@@ -311,9 +311,9 @@ class TBPEDIDOSNOVAVENTAModel {
       console.log('excel convertido en array');
 
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
-        console.log('iniciamos insert');
-
+        
         if (fileName === "REPORTE GENERAL DE OPERACION") {
+          console.log('iniciamos insert REPORTE GENERAL DE OPERACION');
           const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
             'TB_PEDIDOS_NOVAVENTA', 
             ArrayExcel, 
@@ -327,12 +327,16 @@ class TBPEDIDOSNOVAVENTAModel {
           }
         }
         if (fileName == "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO") {
+          console.log('iniciamos insert REPORTE GENERAL DE OPERACION DEVOLUCIONES NOVAVENTA SCO');
           const insertDevolucionesNovaventa = await TBPEDIDOSNOVAVENTAModel.insertorUpdateDevolucionesNovaventa(
             'TB_DEVOLUCIONES_NOVAVENTA',
             ArrayExcel,
             '',
             []
           );
+          if (res) {
+            return res.status(200).json({data: insertDevolucionesNovaventa})
+          }
         }
         // eliminamos archivos
         const filePath1 = path.join(__dirname, "../../temp", `${fileName}.xls`);
@@ -402,7 +406,10 @@ class TBPEDIDOSNOVAVENTAModel {
     const excludeFieldDevoluciones = [ ...excludeFields ];
     const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones );
 
-    return { message: "Da"}
+    const excludeFieldsCristian = [ ...excludeFields ];
+    const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
+
+    return { message: "Datos ingresados y actualizados correctamente", data: { res, resCristian }};
   }
 
 

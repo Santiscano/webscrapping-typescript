@@ -49,10 +49,10 @@ class RunScrapps {
       /**
        * *Scrapping principal de descarga de archivo de reportes general de operacion
        */
-      // WebScrapping.getCampaingsNovaventaModel(
-      //   campaings[this.position],
-      //   "REPORTE GENERAL DE OPERACION"
-      // );
+      WebScrapping.getCampaingsNovaventaModel(
+        campaings[this.position],
+        "REPORTE GENERAL DE OPERACION"
+      );
   
       /**
        * *Este scrapp es para la configuracion de devoluciones 
