@@ -1,71 +1,76 @@
 import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
 import { requestData as req } from "../docs/novaventa";
+
 import campaingsModel from "../models/campaings.model";
+import CedisReques from "../models/cedis.model";
 
-
+interface CedisRequestType {
+  ID:number,
+  SCRAP_NAME: string,
+  CEDI_OPTION_CODE: number,
+  CEDI: number,
+  ACTIVO: boolean,
+  SECOND_PREVIOUS_CAMPAING: string,
+  PREVIOUS_CAMPAING: string,
+  CURRENT_CAMPAING: string,
+  NEW_CAMPAING: string,
+  POSITION_CAMPAING: number,
+}
 class RunScrapps {
-
-  static position = 0;
   
-  static runEveryFifteenMinutes() {
+  static async bucleScrapp() {
     try {
-      console.log('start run scrapp to 15 min');
-  
-      this.runEveryFourMinutes();
-  
-      const intervalAction = setInterval(() => {
-        this.runEveryFourMinutes();
-      }, 1000 * 60 * 4) // cada 4 minutos
+      const runPromises = async () => {
+        const cedis = await CedisReques.getCedis() as CedisRequestType[];
+        const promises = cedis.map(cedisItem => this.runForCedi(cedisItem));
+        await Promise.allSettled(promises);
+      }
 
-      setTimeout(() => {
-        clearInterval(intervalAction);
-        console.log("Terminando el proceso de scraping de 15 min");
-      }, 1000 * 60 * 14) // finaliza todo al minuto 14 el proceso de los 4 min
+      await runPromises(); // se disparan la funcion runForCedi la cantidad de cedis que haya en la base de datos
     } catch (error) {
-      throw new Error(`fallo la ejecucion de 15min con error: ${error}`);
+      console.error(`fallo la ejecucion de runBucleScrapp con error: ${error}`);
+    } finally {
+      setTimeout(() => this.bucleScrapp(), 20 * 1000); // se ejecuta cada 20 segundos y se llama a si mismo
     }
   };
 
-  static async runEveryFourMinutes() {
+  static async runForCedi({ ID, CEDI_OPTION_CODE, CEDI,
+    CURRENT_CAMPAING, PREVIOUS_CAMPAING, SECOND_PREVIOUS_CAMPAING, 
+    POSITION_CAMPAING 
+  }: CedisRequestType) {
     try {
-      console.log(`entro a run every four minutes por ${this.position + 1} vez`);
-      
-      // traer data api y  transformar
-      const data = (await campaingsModel.getCampaings()).data[0];
-      const campaingsObj = {
-        SECOND_PREVIOUS_CAMPAING: data.SECOND_PREVIOUS_CAMPAING,
-        PREVIOUS_CAMPAING: data.PREVIOUS_CAMPAING,
-        CURRENT_CAMPAING: data.CURRENT_CAMPAING
+      if ( POSITION_CAMPAING >= 3 ) {
+        POSITION_CAMPAING = 0 // convertirlo aqui
+        CedisReques.updatePositionCampaing(0, ID); // actualizar valor en base de datos
       }
-      console.log('campaingsObj: ', campaingsObj);
-      const campaings = Object.values(campaingsObj)
-      console.log(`re-iniciamos scrapping con campaña ${campaings[this.position]}`);
-
-      // validamos posicion a ejecutar
-      if ( this.position >= 3 ) {
-        this.position = 0
-      };
       
+      const campaings = [ CURRENT_CAMPAING, PREVIOUS_CAMPAING, SECOND_PREVIOUS_CAMPAING ];
+
       /**
-       * *Scrapping principal de descarga de archivo de reportes general de operacion
+       * Scrapping principal de descarga de archivo de reportes general de operacion
        */
-      WebScrapping.getCampaingsNovaventaModel(
-        campaings[this.position],
-        "REPORTE GENERAL DE OPERACION"
+      await WebScrapping.getCampaingsNovaventaModel(
+        campaings[POSITION_CAMPAING], // camapaña a descargar
+        String(CEDI_OPTION_CODE), // cedi a descargar
+        "REPORTE GENERAL DE OPERACION", // nombre del archivo
+        CEDI // cedi a descargar
       );
-  
+
       /**
-       * *Este scrapp es para la configuracion de devoluciones 
+       * Este scrapp es para la configuracion de devoluciones 
        * !ahora tiene un error porque la base de datos no tiene los datos correctos
        */
-      WebScrapping.caliCampaingsNovaventaModel(
-        campaings[this.position],
-        "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO"
+      await WebScrapping.NoveltyNovaventaModel(
+        campaings[POSITION_CAMPAING],
+        String(CEDI_OPTION_CODE),
+        "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO",
+        CEDI
       );
-  
-      this.position++;
+
+      const newPosition = POSITION_CAMPAING + 1;
+      await CedisReques.updatePositionCampaing(newPosition, ID);
     } catch (error) {
-      throw new Error(`fallo la ejecucion de 4 minutos con error: ${error}`)
+      console.error(`fallo la ejecucion de 4 minutos con error: ${error}`)
     }
   };
 

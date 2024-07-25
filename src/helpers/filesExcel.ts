@@ -135,8 +135,6 @@ const storage = multer.memoryStorage();
         .map(s => s.replace(/ /g, '_'));   // Reemplaza espacios por guiones bajos
       const data: Array<Record<string, any>> = []; // Inicializar array para almacenar datos
 
-      console.log('obtuvo los headers')
-  
       if (fileExtension === 'xlsx' || fileExtension === 'xls') {
         // Iterar sobre cada fila a partir de la segunda fila
         for (let i = rowBody; i <= worksheet?.rowCount!; i++) {
