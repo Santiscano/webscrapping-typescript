@@ -1,14 +1,13 @@
 import { PassThrough } from "stream";
-import path from 'path';
-import fs from 'fs';
+import path from "path";
+import fs from "fs";
 
 import "dotenv/config";
 import { Response } from "express";
-import ExcelJS from 'exceljs';
+import ExcelJS from "exceljs";
 import XLSX from "xlsx";
 
 class Excel {
-
   /**
    * Exporta datos a un archivo Excel y envía la respuesta al cliente.
    * @param res - Objeto Response de Express.
@@ -25,30 +24,39 @@ class Excel {
    * route.get('/exportExcel', (req: Request, res: Response ) => {
    *    Excel.ExportExcel(res, data, Object.keys(data[0]), "santiago-presentacion", "el santi");
    * })
-   * 
-   * 
+   *
+   *
    */
-  static async ExportExcel(res:Response, data: {}[], headers: string[], fileName:string = String(new Date), nameSheet:string = "sheet1"){
-
+  static async ExportExcel(
+    res: Response,
+    data: {}[],
+    headers: string[],
+    fileName: string = String(new Date()),
+    nameSheet: string = "sheet1"
+  ) {
     try {
       const workbook = new ExcelJS.Workbook(); // crear libro de trabajo
       const worksheet = workbook.addWorksheet(nameSheet); // crear hoja de calculo
       // worksheet.columns = [{header: "nombre", key: "key", width: 30}]; // cuando se necesita mas personalizado "1 objeto por columna"
       const headerRow = worksheet.addRow(headers); // agrega encabezado a la hoja de calculo
-      worksheet.autoFilter = worksheet.getColumn(1).letter + "1:" + worksheet.getColumn( headers.length ).letter + ( data.length + 1  ); // configura el filtro automatico en la hoja de calculo
+      worksheet.autoFilter =
+        worksheet.getColumn(1).letter +
+        "1:" +
+        worksheet.getColumn(headers.length).letter +
+        (data.length + 1); // configura el filtro automatico en la hoja de calculo
 
       data.forEach((fila, index) => {
-        const row = worksheet.addRow( Object.values(fila) ); // llenar cada fila - " se unsa Object porque addRow recibe es string[] "
+        const row = worksheet.addRow(Object.values(fila)); // llenar cada fila - " se unsa Object porque addRow recibe es string[] "
         let fillColor = index % 2 === 0 ? "f9fafb" : "ffffff";
-        
+
         for (let column = 1; column < headers.length + 1; column++) {
           const cell = row.getCell(column);
           const cellHeaders = headerRow.getCell(column);
 
           cellHeaders.fill = {
             type: "pattern",
-            pattern:"solid",
-            fgColor:{ argb: "FFFFFF" },
+            pattern: "solid",
+            fgColor: { argb: "FFFFFF" },
           };
           cellHeaders.font = {
             color: { argb: "000000" },
@@ -60,16 +68,20 @@ class Excel {
             fgColor: { argb: fillColor },
           };
         }
-
       });
 
-      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      res.setHeader('Content-Disposition', `attachment; filename=${fileName.replace(" ", "-")}.xlsx`);
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=${fileName.replace(" ", "-")}.xlsx`
+      );
 
       return await workbook.xlsx.write(res);
-
     } catch (error) {
-      console.log('error: ', error);
+      console.log("error: ", error);
     }
   }
 
@@ -102,40 +114,46 @@ const storage = multer.memoryStorage();
    * })
    */
   static async ExcelToArray(
-    fileContent: Buffer, fileExtension: 'xlsx' | 'xls' | 'csv', 
-    rowHeader: number = 1, rowBody: number = 2, 
-    filePath?:string, newFilePath?:string
+    fileContent: Buffer,
+    fileExtension: "xlsx" | "xls" | "csv",
+    rowHeader: number = 1,
+    rowBody: number = 2,
+    filePath?: string,
+    newFilePath?: string
   ): Promise<Array<Record<string, any>> | Record<string, string>> {
     try {
       // CREAMOS LIBRO DE TRABAJO
       const workbook = new ExcelJS.Workbook();
-      
-      if (fileExtension === 'xlsx' ) {
+
+      if (fileExtension === "xlsx") {
         await workbook.xlsx.load(fileContent); // Cargar datos desde el buffer
-      } else if (fileExtension === 'csv') {
+      } else if (fileExtension === "csv") {
         const bufferStream = new PassThrough(); // instanciamos un stream
         bufferStream.end(fileContent); // convertimos buffer a stream
         await workbook.csv.read(bufferStream); // carga datos desde stream
-      } else if (fileExtension === 'xls') {
+      } else if (fileExtension === "xls") {
         if (filePath && newFilePath) {
-          const xlsFile = XLSX.readFile(filePath, {type: 'file'}); // libreria xlsx lee el archivo xls
-          await XLSX.writeFile(xlsFile, newFilePath , {type: 'file'}); // convertimos esa lectura en un nuevo archivo .xlsx
-          await workbook.xlsx.load( fs.readFileSync( newFilePath ));
+          const xlsFile = XLSX.readFile(filePath, { type: "file" }); // libreria xlsx lee el archivo xls
+          await XLSX.writeFile(xlsFile, newFilePath, { type: "file" }); // convertimos esa lectura en un nuevo archivo .xlsx
+          await workbook.xlsx.load(fs.readFileSync(newFilePath));
         } else {
           return { message: "No se brindo el path del archivo" };
         }
       } else {
-        return { message: "Formato de archivo no compatible. Solo se admiten archivos Excel (.xlsx) o CSV (.csv)." };
+        return {
+          message:
+            "Formato de archivo no compatible. Solo se admiten archivos Excel (.xlsx) o CSV (.csv).",
+        };
       }
 
       const worksheet = workbook.getWorksheet(1); // Obtener la primera hoja del libro
       const preheaders = worksheet?.getRow(rowHeader).values as string[]; // Obtener encabezados
       const headers = preheaders
-        .map(s => s.replace(/^#\s*/, ''))  // Elimina '#' y espacios al principio
-        .map(s => s.replace(/ /g, '_'));   // Reemplaza espacios por guiones bajos
+        .map((s) => s.replace(/^#\s*/, "")) // Elimina '#' y espacios al principio
+        .map((s) => s.replace(/ /g, "_")); // Reemplaza espacios por guiones bajos
       const data: Array<Record<string, any>> = []; // Inicializar array para almacenar datos
 
-      if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+      if (fileExtension === "xlsx" || fileExtension === "xls") {
         // Iterar sobre cada fila a partir de la segunda fila
         for (let i = rowBody; i <= worksheet?.rowCount!; i++) {
           const rowData = worksheet?.getRow(i).values as Array<any>;
@@ -145,33 +163,32 @@ const storage = multer.memoryStorage();
         }
 
         return data;
-      } else if (fileExtension === 'csv') {
-        const keys = headers[1].split(',');
+      } else if (fileExtension === "csv") {
+        const keys = headers[1].split(",");
 
         for (let i = rowBody; i < worksheet?.rowCount!; i++) {
           const rowData = worksheet?.getRow(i).values as Array<any>;
-          const bodyRow = rowData[1].split(',');
+          const bodyRow = rowData[1].split(",");
 
-          const obj = keys.reduce(( ob:any, key, index ) => {
+          const obj = keys.reduce((ob: any, key, index) => {
             ob[key] = bodyRow[index];
             return ob; // retorno el objeto modificado en cada iteracion
-          }, {})
+          }, {});
 
           data.push(obj);
         }
 
         return data;
       } else {
-        return {message: "no deberia estar esta respuesta" };
+        return { message: "no deberia estar esta respuesta" };
       }
     } catch (error) {
-      throw new Error('Error al cargar datos desde el archivo: ' + error);
+      throw new Error("Error al cargar datos desde el archivo: " + error);
     }
   }
 }
 
 export default Excel;
-
 
 // =============FRONTEND================== //
 // <table id="myTable">
@@ -233,4 +250,3 @@ export default Excel;
 //     });
 //   }
 // </script>
-

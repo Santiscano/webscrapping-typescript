@@ -12,7 +12,7 @@ export const connection = mysql.createPool({
   password: DB_PASSWORD,
   database: DB_DATABASE,
   port: DB_PORT,
-})
+});
 
 export const connectionCristianBD = mysql.createPool({
   host: E_CONTROL_REPORT_DB_HOST,
@@ -21,4 +21,4 @@ export const connectionCristianBD = mysql.createPool({
   port: Number(E_CONTROL_REPORT_DB_PORT),
   password: E_CONTROL_REPORT_DB_PASSWORD,
   connectTimeout: 60000, // 60 seconds
-})
+});

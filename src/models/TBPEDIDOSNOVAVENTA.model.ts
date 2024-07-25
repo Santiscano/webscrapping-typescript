@@ -4,6 +4,7 @@ import path from 'path';
 import { Response } from 'express';
 import puppeteer, { Browser, HTTPRequest, HTTPResponse } from "puppeteer";
 
+import cedisModel from './cedis.model';
 import { requestData } from '../docs/novaventa';
 import ApiResponses from "../helpers/apiResponse";
 import Excel from "../helpers/filesExcel";
@@ -11,7 +12,6 @@ import { resStatus } from "../helpers/resStatus";
 import SqlCrud from "../helpers/sqlCrud";
 import SQLResponse from "../interfaces/sql2";
 import campaingsModel from './campaings.model';
-import CampaignsRequest from './campaings.model';
 
 class TBPEDIDOSNOVAVENTAModel {
   protected static headless: boolean | "new" | undefined = "new";
@@ -102,7 +102,7 @@ class TBPEDIDOSNOVAVENTAModel {
       const formReporter = await page.waitForSelector('#SqlFields');
 
       await page.type("#param2", campaing);
-      // await page.type("#param3", "novaventa");
+      // await page.type("#param3", "novaventa"); // no lo contiene el formulario
       await page.select("#param4", codeCedi);
 
       const generateReportButton = await page.waitForSelector('#SqlFields tbody input[type="button"]');
@@ -250,7 +250,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
 
   // !=============================SIN ACTUALIZAR===================== *//
-  static async validateNewCampaing( campaingValidate:string, codeCedi:string, fileName = "REPORTE GENERAL DE OPERACION") {
+  static async validateNewCampaing( campaingValidate:string, codeCedi:string, id:number, fileName = "REPORTE GENERAL DE OPERACION") {
     let isPageForm = false;
     const temDir = `../../temp/${codeCedi}/${campaingValidate}`;
     const { login, password } = requestData.body;
@@ -271,7 +271,7 @@ class TBPEDIDOSNOVAVENTAModel {
       // Habilitamos la interceptación de solicitudes
       await page.setRequestInterception(true);
       page.on('request', this.request);
-      page.on( 'response', (response) => this.validateDownloadExcel(response, browser, fileName, campaingValidate) );
+      page.on( 'response', (response) => this.validateDownloadExcel(response, browser, fileName, campaingValidate, id) );
       page.on( 'load', () => {
         if (isPageForm) {
           console.log('no hay datos para esta campaña');
@@ -312,7 +312,7 @@ class TBPEDIDOSNOVAVENTAModel {
     }
   };
 
-  static async validateDownloadExcel(response: HTTPResponse, browser: Browser, fileName:string, newCampaing:string) {
+  static async validateDownloadExcel(response: HTTPResponse, browser: Browser, fileName:string, newCampaing:string, id:number) {
     const contentDisposition = response.headers()['content-disposition'];
     
     if ( contentDisposition && contentDisposition.startsWith('attachment')) {
@@ -328,26 +328,16 @@ class TBPEDIDOSNOVAVENTAModel {
           const filePath1 = path.join(__dirname, "../../temp/validate", `${fileName}.xls`);
           if(fs.existsSync(filePath1)) fs.unlinkSync(filePath1);
 
-          this.updateListCampaingModel(newCampaing)
+          this.updateListCampaingModel(newCampaing, id);
 
         }, 3000)
       }
     }
   };
 
-  static async updateListCampaingModel(newCampaing:string) {
-    const data = (await campaingsModel.getCampaings()).data[0];
-    
-    const newData = {
-      SECOND_PREVIOUS_CAMPAING: data.PREVIOUS_CAMPAING,
-      PREVIOUS_CAMPAING: data.CURRENT_CAMPAING,
-      CURRENT_CAMPAING: data.NEW_CAMPAING,
-      NEW_CAMPAING: String(+data.NEW_CAMPAING + 1)
-    }
-    console.log('newData', newData);
-
-    const resUpdate = await campaingsModel.updatedCampaing(newData);
-    return resUpdate;
+  static async updateListCampaingModel(newCampaing:string, id:number) {
+    await cedisModel.updateNewCampaigns(newCampaing, id);
+    return true;
   };
   // !================================================================ *//
 }

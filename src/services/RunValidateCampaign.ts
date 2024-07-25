@@ -3,6 +3,7 @@ import campaingsModel from "../models/cedis.model";
 
 
 interface CedisRequestType {
+  ID: number;
   NEW_CAMPAING: string;
   CEDI_OPTION_CODE:string;
 }
@@ -25,9 +26,9 @@ class RunValidateCampaign {
     }
   }
 
-  static async runForCedi({ NEW_CAMPAING, CEDI_OPTION_CODE }: CedisRequestType) {
+  static async runForCedi({ NEW_CAMPAING, CEDI_OPTION_CODE, ID }: CedisRequestType) {
     try {
-      await WebScrapping.validateNewCampaing(NEW_CAMPAING, CEDI_OPTION_CODE);
+      await WebScrapping.validateNewCampaing(NEW_CAMPAING, CEDI_OPTION_CODE, ID);
     } catch (error) {
       console.error(`fallo la ejecucion de runForCedi con error: ${error}`);
     }

@@ -1,5 +1,5 @@
-import { connection, connectionCristianBD } from '../config/database/mysql';
-import SQLResponse from '../interfaces/sql2';
+import { connection, connectionCristianBD } from "../config/database/mysql";
+import SQLResponse from "../interfaces/sql2";
 
 interface getTable {
   status?: boolean;
@@ -8,23 +8,26 @@ interface getTable {
 }
 
 class SqlCrud {
-
   /**
    * Obtiene todos los registros de una tabla de la base de datos.
    * @param {string} table - Nombre de la tabla de la que se obtendrán los registros.
    * @returns {Promise<getTable>} - Promesa que se resuelve con un objeto que indica si se obtuvieron datos y los datos en sí.
    */
-  static async getTable( table:string, offset:number, limit:number, orderBy:string, sort:string ): Promise<getTable>{
+  static async getTable(
+    table: string,
+    offset: number,
+    limit: number,
+    orderBy: string,
+    sort: string
+  ): Promise<getTable> {
     const [query]: SQLResponse = await connection.query(`
-      SELECT * FROM ${table} ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset};`
-    );
-    console.log(query)
+      SELECT * FROM ${table} ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset};`);
+    console.log(query);
     if (query.lenght === 0) {
       return { status: false, data: query };
     }
     return { status: true, data: query };
-  };
-
+  }
 
   /**
    * Obtiene un registro de una tabla de la base de datos basado en un atributo y su valor.
@@ -37,15 +40,19 @@ class SqlCrud {
     table: string,
     attribute: string,
     value: string | number
-  ): Promise<getTable>{
-    const [ query ]: SQLResponse = await connection.query( `SELECT * FROM ${table} WHERE ${attribute} = ?`, [value] );
-    if ( !query ) {
-      return { message: `Datos con id ${value}, no se encuentran en la base de datos` };
+  ): Promise<getTable> {
+    const [query]: SQLResponse = await connection.query(
+      `SELECT * FROM ${table} WHERE ${attribute} = ?`,
+      [value]
+    );
+    if (!query) {
+      return {
+        message: `Datos con id ${value}, no se encuentran en la base de datos`,
+      };
     }
 
     return { message: "Datos encontrados con exito", data: query };
-  };
-
+  }
 
   /**
    * Cuenta la cantidad de registros en una tabla de la base de datos que cumplen con ciertos criterios.
@@ -54,14 +61,19 @@ class SqlCrud {
    * @param {string | number} value - Valor del atributo que se utilizará para la condición de conteo.
    * @returns {Promise<number>} - Promesa que se resuelve con la cantidad de registros que cumplen con los criterios especificados.
    */
-  static async countRows( table: string,  attribute?: string,  value?: string | number ): Promise<number>{
-    const query = `SELECT count(*) AS contador FROM ${ table } ${(attribute && value) ? `WHERE ${ attribute } = ?` : ''}`;
-    const [ validate ]: SQLResponse = await connection.query(query, [ value ] );
-    console.log('validate: ', validate);
-    
-    return validate[0].contador;
-  };
+  static async countRows(
+    table: string,
+    attribute?: string,
+    value?: string | number
+  ): Promise<number> {
+    const query = `SELECT count(*) AS contador FROM ${table} ${
+      attribute && value ? `WHERE ${attribute} = ?` : ""
+    }`;
+    const [validate]: SQLResponse = await connection.query(query, [value]);
+    console.log("validate: ", validate);
 
+    return validate[0].contador;
+  }
 
   /**
    * Inserta un nuevo registro en una tabla de la base de datos.
@@ -69,13 +81,13 @@ class SqlCrud {
    * @param {Object} values - Objeto que contiene las columnas y valores a insertar en la nueva fila.
    * @returns {Promise<SQLResponse>} - Promesa que se resuelve con los datos del nuevo registro insertado.
    */
-  static async insertToObject( table: string, values:{}): Promise<SQLResponse>{
-    const [ data ]: SQLResponse = await connection.query(
-      `INSERT INTO ${table} SET ? ;`, [values]
+  static async insertToObject(table: string, values: {}): Promise<SQLResponse> {
+    const [data]: SQLResponse = await connection.query(
+      `INSERT INTO ${table} SET ? ;`,
+      [values]
     );
     return data;
-  };
-
+  }
 
   /**
    * Inserta múltiples registros en una tabla de la base de datos.
@@ -83,13 +95,18 @@ class SqlCrud {
    * @param {Array<object>} dataToInsert - Array de objetos representando los datos a ser insertados.
    * @returns {Promise<void>} - Promesa que se resuelve una vez completada la inserción.
    */
-  static async insertBulk(tableName:string, dataToInsert: {}[]): Promise<void>{
-    const columns = Object.keys( dataToInsert[0] );
-    const keys = columns.join(', ');
+  static async insertBulk(
+    tableName: string,
+    dataToInsert: {}[]
+  ): Promise<void> {
+    const columns = Object.keys(dataToInsert[0]);
+    const keys = columns.join(", ");
 
-    const valuesArray = dataToInsert.map( data => Object.values( data )) 
-    await connection.query( `INSERT INTO ${tableName} (${keys}) VALUES ?`, [ valuesArray ] );
-  };
+    const valuesArray = dataToInsert.map((data) => Object.values(data));
+    await connection.query(`INSERT INTO ${tableName} (${keys}) VALUES ?`, [
+      valuesArray,
+    ]);
+  }
 
   /**
    * Inserta múltiples registros en una tabla de la base de datos.
@@ -99,43 +116,57 @@ class SqlCrud {
    * @param {Array<string>} excludeFields - lista de columnas que no se actualizaran en la parte de la sentencia "ON DUPLICATE KEY UPDATE"
    * @returns {Promise<void>} - Promesa que se resuelve una vez completada la inserción o actualización.
    */
-  static async insertOrUpdateBulk(tableName: string, dataToInsert: Record<string, any>[], uniqueKey: string, excludeFields: string[] = []): Promise<void> {
+  static async insertOrUpdateBulk(
+    tableName: string,
+    dataToInsert: Record<string, any>[],
+    uniqueKey: string,
+    excludeFields: string[] = []
+  ): Promise<void> {
     const columns = Object.keys(dataToInsert[0]);
-    const keys = columns.join(', ');
+    const keys = columns.join(", ");
 
-    const valuesArray = dataToInsert.map(data => Object.values(data));
+    const valuesArray = dataToInsert.map((data) => Object.values(data));
     const updateSet = columns
-      .filter(column => column !== uniqueKey && !excludeFields.includes(column)) // Excluir las claves que no se actualizaran
-      .map(column => `${column} = VALUES(${column})`)
-      .join(', '); // Generar la parte SET para la cláusula ON DUPLICATE KEY UPDATE 341464
-  
+      .filter(
+        (column) => column !== uniqueKey && !excludeFields.includes(column)
+      ) // Excluir las claves que no se actualizaran
+      .map((column) => `${column} = VALUES(${column})`)
+      .join(", "); // Generar la parte SET para la cláusula ON DUPLICATE KEY UPDATE 341464
+
     const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
     const result = await connection.query(query, [valuesArray]);
-    console.log('result database 1: ', result);
-  };
-
-  static async insertOrUpdateBulkCristianDB(tableName: string, dataToInsert: Record<string, any>[], uniqueKey: string, excludeFields: string[] = []): Promise<void> {
-    const batchSize = dataToInsert.length;
-    for(let i = 0; i < dataToInsert.length; i += batchSize){
-      console.log('i: ', i);
-      const batch = dataToInsert.slice(i, i + batchSize);
-      
-      const columns = Object.keys(batch[0]);
-      const keys = columns.join(', ');
-      
-      const valuesArray = batch.map(data => Object.values(data));
-      const updateSet = columns
-        .filter(column => column !== uniqueKey && !excludeFields.includes(column)) // Excluir las claves que no se actualizaran
-        .map(column => `${column} = VALUES(${column})`)
-        .join(', '); // Generar la parte SET para la cláusula ON DUPLICATE KEY UPDATE 341464
-
-      const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
-      const resultCristian = await connectionCristianBD.query(query, [valuesArray]);
-      console.log('resultCristian: ', resultCristian);
-      
-    }
+    console.log("result database 1: ", result);
   }
 
+  static async insertOrUpdateBulkCristianDB(
+    tableName: string,
+    dataToInsert: Record<string, any>[],
+    uniqueKey: string,
+    excludeFields: string[] = []
+  ): Promise<void> {
+    const batchSize = dataToInsert.length;
+    for (let i = 0; i < dataToInsert.length; i += batchSize) {
+      console.log("i: ", i);
+      const batch = dataToInsert.slice(i, i + batchSize);
+
+      const columns = Object.keys(batch[0]);
+      const keys = columns.join(", ");
+
+      const valuesArray = batch.map((data) => Object.values(data));
+      const updateSet = columns
+        .filter(
+          (column) => column !== uniqueKey && !excludeFields.includes(column)
+        ) // Excluir las claves que no se actualizaran
+        .map((column) => `${column} = VALUES(${column})`)
+        .join(", "); // Generar la parte SET para la cláusula ON DUPLICATE KEY UPDATE 341464
+
+      const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
+      const resultCristian = await connectionCristianBD.query(query, [
+        valuesArray,
+      ]);
+      console.log("resultCristian: ", resultCristian);
+    }
+  }
 
   /**
    * Actualiza una fila en la tabla especificada con los nuevos valores proporcionados.
@@ -150,17 +181,18 @@ class SqlCrud {
     table: string,
     attribute: string,
     id: string | number,
-    values: {},
+    values: {}
   ): Promise<SQLResponse> {
     const params = Object.keys(values);
     const allValues = [...Object.values(values), id];
 
-    const query = `UPDATE ${table} SET ${params.join(' = ?, ')} = ? WHERE ${attribute} = ?`;
-    const [ data ]: SQLResponse = await connection.query( query, allValues );
-    
-    return data ;
-  };
+    const query = `UPDATE ${table} SET ${params.join(
+      " = ?, "
+    )} = ? WHERE ${attribute} = ?`;
+    const [data]: SQLResponse = await connection.query(query, allValues);
 
+    return data;
+  }
 
   /**
    * Elimina un registro de una tabla de la base de datos basado en un atributo y su valor.
@@ -169,24 +201,24 @@ class SqlCrud {
    * @param {string | number} value - Valor del atributo que se utilizará para identificar el registro a eliminar.
    * @returns {Promise<{ status: boolean; message: string }>} - Promesa que se resuelve con un objeto que indica el resultado de la operación de eliminación y un mensaje descriptivo.
    */
-  static async deleteRowTable ( table: string, attribute: string, value: string | number ): Promise<{ data?: SQLResponse; message?: string }> {
-    if( await this.countRows(table, attribute, value) === 0 ){
-      return { message: `${attribute}: ${value}, no se ha encontrado en la tabla: ${table}` };
+  static async deleteRowTable(
+    table: string,
+    attribute: string,
+    value: string | number
+  ): Promise<{ data?: SQLResponse; message?: string }> {
+    if ((await this.countRows(table, attribute, value)) === 0) {
+      return {
+        message: `${attribute}: ${value}, no se ha encontrado en la tabla: ${table}`,
+      };
     }
 
-    const [ data ]: SQLResponse = await connection.query(`DELETE FROM ${table} WHERE ${attribute} = ?`, [ value ]);
+    const [data]: SQLResponse = await connection.query(
+      `DELETE FROM ${table} WHERE ${attribute} = ?`,
+      [value]
+    );
 
     return data;
-  };
-
-
-
-
-
-
-
-
-
+  }
 
   // ========================aun no estan completas del todo o tienen errores ==================//
   /**
@@ -196,12 +228,12 @@ class SqlCrud {
    * @param {(string | number | boolean | null)[]} values - Array de valores correspondientes a las columnas especificadas.
    * @returns {Promise<SQLResponse>} - Promesa que se resuelve con los datos del nuevo registro insertado.
    */
-  static insert =async (
-    table:string,
+  static insert = async (
+    table: string,
     keys: string[],
     values: (string | number | boolean | null)[]
   ): Promise<SQLResponse> => {
-    const [ data ]: SQLResponse = await  connection.query(
+    const [data]: SQLResponse = await connection.query(
       `INSERT INTO ${table} (${keys}) VALUES ( ? );`,
       [values]
     );
@@ -210,15 +242,21 @@ class SqlCrud {
 
   /**
    * Realiza una inserción masiva de datos en una tabla de la base de datos.
-   * @param {string} table - Nombre de la tabla en la que se realizará la inserción. 
+   * @param {string} table - Nombre de la tabla en la que se realizará la inserción.
    * @param {string[]} keys - Array de nombres de columnas en los que se insertarán los datos.
    * @param {any[][][]} data - Array bidimensional que contiene los valores a ser insertados.
    * @returns {Promise<void>} - Promesa que se resuelve una vez completada la inserción.
    */
-  static async sqlBulk(table: string, keys: string[], data: any[][][]): Promise<void>{
-    await connection.query(`INSERT INTO ${table} (${keys.join(', ')}) VALUES ?;`, data);
-  };
-
+  static async sqlBulk(
+    table: string,
+    keys: string[],
+    data: any[][][]
+  ): Promise<void> {
+    await connection.query(
+      `INSERT INTO ${table} (${keys.join(", ")}) VALUES ?;`,
+      data
+    );
+  }
 }
 
 export default SqlCrud;

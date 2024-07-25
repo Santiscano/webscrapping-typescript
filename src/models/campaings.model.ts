@@ -21,7 +21,7 @@ class campaingsModel {
   }
 
   static async updatedCampaing(data: {}) {
-    return await SqlCrud.updateRow(this.table, 'id', 1, { ...data });
+    return await SqlCrud.updateRow(this.table, "id", 1, { ...data });
   }
 }
 

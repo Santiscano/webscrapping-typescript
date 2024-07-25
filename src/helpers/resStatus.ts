@@ -1,4 +1,3 @@
-
 export const resStatus = {
   success: 200,
   badRquest: 400,

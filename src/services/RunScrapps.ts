@@ -1,8 +1,6 @@
 import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
-import { requestData as req } from "../docs/novaventa";
-
-import campaingsModel from "../models/campaings.model";
 import CedisReques from "../models/cedis.model";
+import { FISRT_CEDI, SECOND_CEDI, THIRD_CEDI } from '../config/configPorts';
 
 interface CedisRequestType {
   ID:number,
@@ -17,15 +15,16 @@ interface CedisRequestType {
   POSITION_CAMPAING: number,
 }
 class RunScrapps {
-  
+
   static async bucleScrapp() {
+    const listCedisActive = [ FISRT_CEDI, SECOND_CEDI, THIRD_CEDI ];
     try {
       const runPromises = async () => {
         const cedis = await CedisReques.getCedis() as CedisRequestType[];
-        const promises = cedis.map(cedisItem => this.runForCedi(cedisItem));
+        const cedis_by_active = cedis.filter(cedisItem => listCedisActive.includes(String(cedisItem.ID)));
+        const promises = cedis_by_active.map(cedisItem => this.runForCedi(cedisItem));
         await Promise.allSettled(promises);
       }
-
       await runPromises(); // se disparan la funcion runForCedi la cantidad de cedis que haya en la base de datos
     } catch (error) {
       console.error(`fallo la ejecucion de runBucleScrapp con error: ${error}`);
