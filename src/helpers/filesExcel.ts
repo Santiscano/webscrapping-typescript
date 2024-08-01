@@ -1,89 +1,11 @@
-import { PassThrough } from "stream";
-import path from "path";
 import fs from "fs";
+import { PassThrough } from "stream";
 
 import "dotenv/config";
-import { Response } from "express";
 import ExcelJS from "exceljs";
 import XLSX from "xlsx";
 
 class Excel {
-  /**
-   * Exporta datos a un archivo Excel y envía la respuesta al cliente.
-   * @param res - Objeto Response de Express.
-   * @param data - Array de objetos con los datos a exportar.
-   * @param headers - Array de strings que representa los encabezados de las columnas.
-   * @param fileName - Nombre del archivo Excel a generar (opcional, por defecto toma la fecha actual).
-   * @param nameSheet - Nombre de la hoja de cálculo (opcional, por defecto "sheet1").
-   * @returns Una promesa que se resuelve cuando la escritura del archivo Excel se completa.
-   * @example
-   * const data = [
-   *    {name: "santiago", lastname: "sierra", email:"santiscano@gmail.com", phone: "3117137084" },
-   *    {name: "santiago", lastname: "sierra", email:"santiscano@gmail.com", phone: "3117137084" }
-   * ]
-   * route.get('/exportExcel', (req: Request, res: Response ) => {
-   *    Excel.ExportExcel(res, data, Object.keys(data[0]), "santiago-presentacion", "el santi");
-   * })
-   *
-   *
-   */
-  static async ExportExcel(
-    res: Response,
-    data: {}[],
-    headers: string[],
-    fileName: string = String(new Date()),
-    nameSheet: string = "sheet1"
-  ) {
-    try {
-      const workbook = new ExcelJS.Workbook(); // crear libro de trabajo
-      const worksheet = workbook.addWorksheet(nameSheet); // crear hoja de calculo
-      // worksheet.columns = [{header: "nombre", key: "key", width: 30}]; // cuando se necesita mas personalizado "1 objeto por columna"
-      const headerRow = worksheet.addRow(headers); // agrega encabezado a la hoja de calculo
-      worksheet.autoFilter =
-        worksheet.getColumn(1).letter +
-        "1:" +
-        worksheet.getColumn(headers.length).letter +
-        (data.length + 1); // configura el filtro automatico en la hoja de calculo
-
-      data.forEach((fila, index) => {
-        const row = worksheet.addRow(Object.values(fila)); // llenar cada fila - " se unsa Object porque addRow recibe es string[] "
-        let fillColor = index % 2 === 0 ? "f9fafb" : "ffffff";
-
-        for (let column = 1; column < headers.length + 1; column++) {
-          const cell = row.getCell(column);
-          const cellHeaders = headerRow.getCell(column);
-
-          cellHeaders.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FFFFFF" },
-          };
-          cellHeaders.font = {
-            color: { argb: "000000" },
-            bold: true,
-          };
-          cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: fillColor },
-          };
-        }
-      });
-
-      res.setHeader(
-        "Content-Type",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      );
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename=${fileName.replace(" ", "-")}.xlsx`
-      );
-
-      return await workbook.xlsx.write(res);
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  }
 
   /**
    * Convierte datos de un archivo Excel o CSV en un array de objetos.

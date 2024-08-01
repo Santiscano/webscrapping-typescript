@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Response } from 'express';
-import puppeteer, { Browser, HTTPRequest, HTTPResponse } from "puppeteer";
+import puppeteer, { Browser, executablePath, HTTPRequest, HTTPResponse } from "puppeteer";
 
 import cedisModel from './cedis.model';
 import { requestData } from '../docs/novaventa';
@@ -15,10 +14,15 @@ import campaingsModel from './campaings.model';
 
 class TBPEDIDOSNOVAVENTAModel {
   protected static headless: boolean | "new" | undefined = "new";
-  protected static configLaunch = { headless: this.headless, args: ['--no-sandbox'] };
+  protected static configLaunch = { 
+    headless: this.headless,
+    executablePath: '/usr/bin/chromium-browser', // comentar si no se esta en linux
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  };
 
   // *===========================SCRAPPING BASE=========================== *//
   static async getCampaingsNovaventaModel(campaing:string, codeCedi:string, fileName:string, Cedi:number) {
+    console.log(`inicia scrapping de campaña: ${campaing} con cedi: ${codeCedi} - ${Cedi}`);
     const tempDir = `../../temp/${codeCedi}/${campaing}`;
     const { login, password } = requestData.body;
     this.createDirectories(codeCedi, campaing); // crear difectorio si no existe
@@ -43,7 +47,6 @@ class TBPEDIDOSNOVAVENTAModel {
       await page.type('input[name="login"]', login);
       await page.type('input[name="password"]', password);
       await page.click('button[type="submit"]');
-      console.log('ingresando al dashboard');
 
       // Esperar a que la página se cargue completamente (puedes ajustar el tiempo según tus necesidades)
       const buttonRedirectReporters = await page.waitForSelector('#reportsMenu a');
@@ -66,6 +69,7 @@ class TBPEDIDOSNOVAVENTAModel {
   };
   // *=============================DEVOLUCIONES=========================== *//
   static async NoveltyNovaventaModel(campaing:string, codeCedi:string, fileName:string, Cedi:number) {
+    console.log(`inicia scrapping de devoluciones de campaña: ${campaing} con cedi: ${codeCedi} - ${Cedi}`);
     const temDir = `../../temp/${codeCedi}/${campaing}`;
     const { login, password } = requestData.body;
 
@@ -155,27 +159,27 @@ class TBPEDIDOSNOVAVENTAModel {
     if ( contentDisposition && contentDisposition.startsWith('attachment') ) {
       const filenameDown = contentDisposition.split("filename=")[1].trim(); 
       if (filenameDown == `${fileName}.xls`) {
-        await this.validateExcelPath(path.join(__dirname, temDir, `${fileName}.xls`))
+        await this.validateExcelPath(path.join(__dirname, temDir, `${fileName}.xls`), Cedi)
         browser.close();
         setTimeout(() => this.updateReportDB(fileName, temDir, Cedi), 3000);
       }
     };
   };
 
-  static async validateExcelPath (filePath:string) {
+  static async validateExcelPath (filePath:string, Cedi:number) {
     return new Promise((resolve, reject) => {
       const intervalo = setInterval(() => {
         if (fs.existsSync(filePath)) {
           clearInterval(intervalo);
           resolve("Archivo encontrado");
         } else {
-          console.log('esperando archivo');
+          console.log('esperando archivo de cedi: ', Cedi);
         }
       }, 300 );
     })
   };
 
-  static async updateReportDB(fileName:string, tempDir:string, Cedi:number, res?: Response) {
+  static async updateReportDB(fileName:string, tempDir:string, Cedi:number) {
     try {
       const filePath = path.join( __dirname, tempDir, `${fileName}.xls` );
       const newFilePath = path.join( __dirname, tempDir, `${fileName.replace(" ", "-")}.xlsx` );
@@ -184,7 +188,7 @@ class TBPEDIDOSNOVAVENTAModel {
       const ArrayExcel = await Excel.ExcelToArray( buffer, "xls", 1, 2, filePath, newFilePath );
       // @ts-ignore
       const ExcelWithCedi = ArrayExcel.map((item) => ({ ...item, Cedi: Number(Cedi) }));
-      console.log('primer item que insertara: ', ExcelWithCedi[0]);
+      console.log('primer item que insertara, ya tiene cedi: ', ExcelWithCedi[0]);
 
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
         if (fileName === "REPORTE GENERAL DE OPERACION") {
@@ -196,9 +200,6 @@ class TBPEDIDOSNOVAVENTAModel {
               'Ciudad', 'Seccion', 'Zona', 'Valor_Venta', 'Factura_De_Venta', 'Fecha_De_Venta'
             ]
           );
-          if(res){
-            return res.status(200).json({ data: insertUpdateData });
-          }
         }
         if (fileName == "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO") {
           const insertDevolucionesNovaventa = await TBPEDIDOSNOVAVENTAModel.insertorUpdateDevolucionesNovaventa(
@@ -207,9 +208,6 @@ class TBPEDIDOSNOVAVENTAModel {
             '',
             []
           );
-          if (res) {
-            return res.status(200).json({data: insertDevolucionesNovaventa})
-          }
         }
         // eliminamos archivos
         this.deleteFilesPreivous(fileName, tempDir);
@@ -217,11 +215,8 @@ class TBPEDIDOSNOVAVENTAModel {
         return;
       }
 
-      if (res) res.status(400).json({message: "algo fallo mira consola"});
     } catch (error) {
-      console.log('error: ', error);
-      /* #swagger.responses[500] = { description: 'Error server', schema: { $ref: '#/definitions/unsuccessfully' }} */
-      if (res) res.status(resStatus.serverError).json(ApiResponses.unsuccessfully( error ));
+      console.log('error en ejecucion capturado por el catch: ', error);
     }
   };
 
@@ -285,19 +280,15 @@ class TBPEDIDOSNOVAVENTAModel {
       await page.type('input[name="login"]', login);
       await page.type('input[name="password"]', password);
       await page.click('button[type="submit"]');
-      console.log('ingresando al dashboard');
   
       // Esperar a que la página se cargue completamente (puedes ajustar el tiempo según tus necesidades)
       const buttonRedirectReporters = await page.waitForSelector('#reportsMenu a');
       await buttonRedirectReporters?.click();
-      console.log('ingresando a reportes')
 
       const buttonRedirecOperation = await page.waitForSelector('#contentLink .support-channels .admin_icons li:nth-child(1) a');
       await buttonRedirecOperation?.click();
-      console.log('ingresando a generar reporte')
 
       const formReporter = await page.waitForSelector('#SqlFields');
-      console.log('formulario detectado y registrando');
       
       await page.type("#param2", "novaventa");
       await page.select("#param3", "96673");
@@ -320,7 +311,7 @@ class TBPEDIDOSNOVAVENTAModel {
       console.log('filename download: ', filename);
       
       if (filename.includes('.xls')) {
-        await this.validateExcelPath(path.join(__dirname, "../../temp/validate", `${fileName}.xls`));
+        await this.validateExcelPath(path.join(__dirname, "../../temp/validate", `${fileName}.xls`), id);
         browser.close();
 
         setTimeout(() => {

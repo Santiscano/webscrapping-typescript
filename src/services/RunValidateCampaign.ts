@@ -1,6 +1,6 @@
 import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
 import campaingsModel from "../models/cedis.model";
-
+import { FIRST_CEDI, SECOND_CEDI, THIRD_CEDI } from "../config/configPorts";
 
 interface CedisRequestType {
   ID: number;
@@ -11,13 +11,15 @@ interface CedisRequestType {
 class RunValidateCampaign {
 
   static async bucleValidateCampaign() {
+    // const listCedisActive = [ FIRST_CEDI, SECOND_CEDI, THIRD_CEDI ];
+    const listCedisActive = [ FIRST_CEDI ];
     try {
       const runPromises = async () => {
-        const newCampaigns = await campaingsModel.getNewCampaigns() as CedisRequestType[];
-        const promises = newCampaigns.map(item => this.runForCedi(item));
+        const newCampaigns = await campaingsModel.getCedis() as CedisRequestType[];
+        const campaigns_by_active = newCampaigns.filter(campaignsItem => listCedisActive.includes(String(campaignsItem.ID)));
+        const promises = campaigns_by_active.map(item => this.runForCedi(item));
         await Promise.allSettled(promises);
       };
-
       await runPromises(); // se dispara la funcion por cada cedi que haya en la base de datos
     } catch (error) {
       console.error(`fallo la ejecucion de bucleValidateCampaign con error: ${error}`);

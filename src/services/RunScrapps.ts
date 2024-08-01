@@ -1,6 +1,6 @@
 import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
 import CedisReques from "../models/cedis.model";
-import { FISRT_CEDI, SECOND_CEDI, THIRD_CEDI } from '../config/configPorts';
+import { FIRST_CEDI, SECOND_CEDI, THIRD_CEDI } from '../config/configPorts';
 
 interface CedisRequestType {
   ID:number,
@@ -17,7 +17,9 @@ interface CedisRequestType {
 class RunScrapps {
 
   static async bucleScrapp() {
-    const listCedisActive = [ FISRT_CEDI, SECOND_CEDI, THIRD_CEDI ];
+    // const listCedisActive = [ FIRST_CEDI, SECOND_CEDI, THIRD_CEDI ];
+    const listCedisActive = [ FIRST_CEDI ];
+    console.log('cedis que se van a ejecutar', listCedisActive);
     try {
       const runPromises = async () => {
         const cedis = await CedisReques.getCedis() as CedisRequestType[];

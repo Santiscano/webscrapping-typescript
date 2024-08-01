@@ -38,6 +38,6 @@ export const SSL_CERTIFICATE = process.env.SSL_CERTIFICATE || "ssl-certificate-k
 
 
 // CEDIS
-export const FISRT_CEDI = process.env.FISRT_CEDI || "1";
-export const SECOND_CEDI = process.env.SECOND_CEDI || "2";
-export const THIRD_CEDI = process.env.THIRD_CEDI || "3";
+export const FIRST_CEDI = process.env.FIRST_CEDI;
+export const SECOND_CEDI = process.env.SECOND_CEDI;
+export const THIRD_CEDI = process.env.THIRD_CEDI;

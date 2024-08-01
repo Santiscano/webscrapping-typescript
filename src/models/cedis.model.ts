@@ -22,7 +22,7 @@ class Cedis {
 
   static async getNewCampaigns() {
     const [data] = await connection.query(
-      `SELECT NEW_CAMPAING FROM ${this.table} LIMIT 1`
+      `SELECT ID, NEW_CAMPAING FROM ${this.table} LIMIT 1`
     );
     return data;
   }
