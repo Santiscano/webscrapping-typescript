@@ -20,12 +20,12 @@ class RunScrapps {
 
   static async bucleScrapp() {
     const listCedis = listCedisActive;
-    console.log('cedis a ejecutar scrapp principal', listCedis);
+    // console.log('cedis a ejecutar scrapp principal', listCedis);
     try {
       const runPromises = async () => {
         const cedis = await CedisReques.getCedis() as CedisRequestType[];
         const cedis_by_active = cedis.filter(cedisItem => listCedis.includes(String(cedisItem.ID)));
-        console.log('cedis activos', cedis_by_active);
+        // console.log('cedis activos', cedis_by_active);
         const promises = cedis_by_active.map(cedisItem => this.runForCedi(cedisItem));
         Promise.allSettled(promises).then(() => {
           setTimeout(() => {
@@ -38,7 +38,7 @@ class RunScrapps {
     } catch (error) {
       console.error(`fallo la ejecucion de scrapp principal con error: ${error}`);
     } finally {
-      console.log('llego a finally');
+      // console.log('llego a finally');
     }
   };
 
@@ -76,7 +76,7 @@ class RunScrapps {
       );
 
       // esperar 5 minutos para ejecutar el siguiente scrapping
-      await new Promise(resolve => setTimeout(resolve, this.timeInterval));
+      // await new Promise(resolve => setTimeout(resolve, this.timeInterval));
 
       const newPosition = POSITION_CAMPAING + 1;
       await CedisReques.updatePositionCampaing(newPosition, ID);

@@ -42,7 +42,7 @@ class TBPEDIDOSNOVAVENTAModel {
       }) // esta puerca linea me comio toda la tarde y es la encargada de redireccionar todas las descargas a la carpeta temp
 
       await page.goto('https://app.insitusales.com/');
-      console.log(['SCRAPPING'], `abrimos web de insitusales ${codeCedi}/${campaing}`);
+      // console.log(['SCRAPPING'], `abrimos web de insitusales ${codeCedi}/${campaing}`);
 
       await page.setRequestInterception(true); // Habilitamos la interceptación de solicitudes
       page.on('request', this.request);
@@ -54,7 +54,7 @@ class TBPEDIDOSNOVAVENTAModel {
       await page.type('input[name="login"]', login);
       await page.type('input[name="password"]', password);
       await page.click('button[type="submit"]');
-      console.log(['SCRAPPING'], `login exitoso ${codeCedi}/${campaing}`);
+      // console.log(['SCRAPPING'], `login exitoso ${codeCedi}/${campaing}`);
 
       // Esperar a que la página se cargue completamente (puedes ajustar el tiempo según tus necesidades)
       const buttonRedirectReporters = await page.waitForSelector('#reportsMenu a');
@@ -62,7 +62,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
       const buttonRedirecOperation = await page.waitForSelector('#contentLink .support-channels .admin_icons li:nth-child(1) a');
       await buttonRedirecOperation?.click();
-      console.log(['SCRAPPING'], `redireccion a reportes ${codeCedi}/${campaing}`);
+      // console.log(['SCRAPPING'], `redireccion a reportes ${codeCedi}/${campaing}`);
 
       const formReporter = await page.waitForSelector('#SqlFields');
       
@@ -96,7 +96,7 @@ class TBPEDIDOSNOVAVENTAModel {
       }) // esta linea es la encargada de redireccionar todas las descargas a la carpeta temp
 
       await page.goto('https://app.insitusales.com/');
-      console.log(['DEVOLUCIONES'], `abrimos web de insitusales devoluciones ${codeCedi}/${campaing}`);
+      // console.log(['DEVOLUCIONES'], `abrimos web de insitusales devoluciones ${codeCedi}/${campaing}`);
 
       await page.setRequestInterception(true);
       page.on('request', this.request);
@@ -106,7 +106,7 @@ class TBPEDIDOSNOVAVENTAModel {
       await page.type('input[name="login"]', login);
       await page.type('input[name="password"]', password);
       await page.click('button[type="submit"]');
-      console.log(['DEVOLUCIONES'],`login exitoso devoluciones ${codeCedi}/${campaing}`);
+      // console.log(['DEVOLUCIONES'],`login exitoso devoluciones ${codeCedi}/${campaing}`);
   
       // Esperar a que la página se cargue completamente (puedes ajustar el tiempo según tus necesidades)
       const buttonRedirectReporters = await page.waitForSelector('#reportsMenu a');
@@ -114,7 +114,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
       const buttonRedirecOperation = await page.waitForSelector('#contentLink .support-channels .admin_icons li:nth-child(12) a');
       await buttonRedirecOperation?.click();
-      console.log(['DEVOLUCIONES'], `redireccion a reportes devoluciones ${codeCedi}/${campaing}`);
+      // console.log(['DEVOLUCIONES'], `redireccion a reportes devoluciones ${codeCedi}/${campaing}`);
 
       const formReporter = await page.waitForSelector('#SqlFields');
 
@@ -124,7 +124,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
       const generateReportButton = await page.waitForSelector('#SqlFields tbody input[type="button"]');
       await generateReportButton?.click();
-      console.log(['DEVOLUCIONES'], `se dio click a descargar reporte devoluciones ${codeCedi}/${campaing}`);
+      // console.log(['DEVOLUCIONES'], `se dio click a descargar reporte devoluciones ${codeCedi}/${campaing}`);
     } catch (error) {
       throw new Error(`no se termino el scrapping por el error: ${error}`);
     }
@@ -175,7 +175,7 @@ class TBPEDIDOSNOVAVENTAModel {
       if (filenameDown == `${fileName}.xls`) {
         await this.validateExcelPath(path.join(__dirname, temDir, `${fileName}.xls`), Cedi);
         browser.close();
-        console.log(['SUCCESS'],`se encontro el archivo: ${fileName} cedi: ${Cedi}`);
+        // console.log(['SUCCESS'],`se encontro el archivo: ${fileName} cedi: ${Cedi}`);
         setTimeout(() => this.updateReportDB(fileName, temDir, Cedi), 3000);
       }
     };
@@ -187,9 +187,9 @@ class TBPEDIDOSNOVAVENTAModel {
         if (fs.existsSync(filePath)) {
           clearInterval(intervalo);
           resolve("Archivo encontrado");
-          console.log(['SUCCESS'], `archivo de cedi: ${Cedi} encontrado en path: `, filePath);
+          // console.log(['SUCCESS'], `archivo de cedi: ${Cedi} encontrado en path: `, filePath);
         } else {
-          console.log('esperando archivo de cedi: ', Cedi);
+          // console.log('esperando archivo de cedi: ', Cedi);
         }
       }, 300 );
     })
@@ -204,11 +204,11 @@ class TBPEDIDOSNOVAVENTAModel {
       const ArrayExcel = await Excel.ExcelToArray( buffer, "xls", 1, 2, filePath, newFilePath );
       // @ts-ignore
       const ExcelWithCedi = ArrayExcel.map((item) => ({ ...item, Cedi: Number(Cedi) }));
-      console.log('primer item que insertara, ya tiene cedi: ', ExcelWithCedi[0]);
+      // console.log('primer item que insertara, ya tiene cedi: ', ExcelWithCedi[0]);
 
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
         if (fileName === "REPORTE GENERAL DE OPERACION") {
-          console.log(`inicia proceso de insert de cedi ${Cedi} a las: `, Date.now());
+          // console.log(`inicia proceso de insert de cedi ${Cedi} a las: `, Date.now());
           const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
             this.tableName,
             ExcelWithCedi,
@@ -289,7 +289,7 @@ class TBPEDIDOSNOVAVENTAModel {
       }) // esta puerca linea me comio toda la tarde y es la encargada de redireccionar todas las descargas a la carpeta temp
 
       await page.goto('https://app.insitusales.com/');
-      console.log(['VALIDATE NEW CAMPAIGN'], `abrimos web de insitusales ${codeCedi}/${campaingValidate}`);
+      // console.log(['VALIDATE NEW CAMPAIGN'], `abrimos web de insitusales ${codeCedi}/${campaingValidate}`);
 
       // Habilitamos la interceptación de solicitudes
       await page.setRequestInterception(true);
@@ -312,7 +312,7 @@ class TBPEDIDOSNOVAVENTAModel {
       await page.type('input[name="login"]', login);
       await page.type('input[name="password"]', password);
       await page.click('button[type="submit"]');
-      console.log(['VALIDATE NEW CAMPAIGN'], `login exitoso ${codeCedi}/${campaingValidate}`);
+      // console.log(['VALIDATE NEW CAMPAIGN'], `login exitoso ${codeCedi}/${campaingValidate}`);
   
       // Esperar a que la página se cargue completamente (puedes ajustar el tiempo según tus necesidades)
       const buttonRedirectReporters = await page.waitForSelector('#reportsMenu a');
@@ -320,7 +320,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
       const buttonRedirecOperation = await page.waitForSelector('#contentLink .support-channels .admin_icons li:nth-child(1) a');
       await buttonRedirecOperation?.click();
-      console.log(['VALIDATE NEW CAMPAIGN'], `redireccion a reportes ${codeCedi}/${campaingValidate}`);
+      // console.log(['VALIDATE NEW CAMPAIGN'], `redireccion a reportes ${codeCedi}/${campaingValidate}`);
 
       const formReporter = await page.waitForSelector('#SqlFields');
       
@@ -332,7 +332,7 @@ class TBPEDIDOSNOVAVENTAModel {
       await generateReportButton?.click();
 
       isPageForm = true; // llegamos a la pagina del formulario ahora se activa
-      console.log([campaingValidate], 'Esperando descarga de archivo');
+      // console.log([campaingValidate], 'Esperando descarga de archivo');
     } catch (error) {
       console.error(`no se termino el scrapping por el error: ${error}`);
     }
@@ -346,11 +346,11 @@ class TBPEDIDOSNOVAVENTAModel {
     const contentDisposition = response.headers()['content-disposition'];
     if ( contentDisposition && contentDisposition.startsWith('attachment')) {
       const filename = contentDisposition.split("filename=")[1].trim(); 
-      console.log('filename validate download: ', filename);
+      // console.log('filename validate download: ', filename);
       if (filename.includes('.xls')) {
         await this.validateExcelPath(path.join(__dirname, temDir, `${fileNameAssigned}.xls`), Cedi);
         browser.close();
-        console.log(['SUCCESS'],`se actualizara la campaña de la cedi: ${Cedi}`);
+        // console.log(['SUCCESS'],`se actualizara la campaña de la cedi: ${Cedi}`);
         setTimeout(async () => {
           this.deleteFilesPrevious(fileNameAssigned, temDir);
           await cedisModel.updateNewCampaigns(id);
