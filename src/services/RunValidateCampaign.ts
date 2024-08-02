@@ -10,6 +10,8 @@ interface CedisRequestType {
 
 class RunValidateCampaign {
 
+  static timeInterval = 2 * 60 * 60 * 1000;
+
   static async bucleValidateCampaign() {
     const listCedis = listCedisActive;
     console.log('cedis a ejecutar validacion', listCedis);
@@ -23,7 +25,7 @@ class RunValidateCampaign {
           setTimeout(() => {
             console.log(['ALERT'], 'se esta re-invocando la funcion validacion de campañas');
             this.bucleValidateCampaign();
-          }, 2 * 60 * 60 * 60 * 1000); // se ejecuta cada 2 horas y se llama a si mismo
+          }, this.timeInterval); // se ejecuta cada 2 horas y se llama a si mismo
         })
       };
       await runPromises(); // se dispara la funcion por cada cedi que haya en la base de datos
@@ -31,7 +33,7 @@ class RunValidateCampaign {
       console.error(`fallo la ejecucion de bucleValidateCampaign con error: ${error}`);
     } finally {
       console.log('llego a finally');
-      setTimeout(() => this.bucleValidateCampaign(), 2 * 60 * 60 * 1000); // se ejecuta cada 2 horas y se llama a si mismo
+      setTimeout(() => this.bucleValidateCampaign(), this.timeInterval); // se ejecuta cada 2 horas y se llama a si mismo
     }
   }
 
@@ -39,7 +41,7 @@ class RunValidateCampaign {
     try {
       await WebScrapping.validateNewCampaing(NEW_CAMPAING, CEDI_OPTION_CODE, ID);
 
-      await new Promise(resolve => setTimeout(resolve, 12 * 60 * 60 * 1000)); // se ejecuta cada 12 horas
+      await new Promise(resolve => setTimeout(resolve, this.timeInterval)); // se ejecuta cada 12 horas
       console.log('termino por completo la validacion la nueva campaña');
     } catch (error) {
       console.error(`fallo la ejecucion de runForCedi con error: ${error}`);

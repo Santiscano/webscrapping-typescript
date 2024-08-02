@@ -41,6 +41,6 @@ export const SSL_CERTIFICATE = process.env.SSL_CERTIFICATE || "ssl-certificate-k
 export const FIRST_CEDI = process.env.FIRST_CEDI;
 export const SECOND_CEDI = process.env.SECOND_CEDI;
 export const THIRD_CEDI = process.env.THIRD_CEDI;
-// export const FOURTH_CEDI = process.env.FOURTH_CEDI;
+export const FOURTH_CEDI = process.env.FOURTH_CEDI;
 // export const FIFTH_CEDI = process.env.FIFTH_CEDI;
 // export const SIXTH_CEDI = process.env.SIXTH_CEDI;
