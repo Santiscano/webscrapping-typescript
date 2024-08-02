@@ -120,7 +120,8 @@ class SqlCrud {
     tableName: string,
     dataToInsert: Record<string, any>[],
     uniqueKey: string,
-    excludeFields: string[] = []
+    excludeFields: string[] = [],
+    cedi: number
   ): Promise<void> {
     const columns = Object.keys(dataToInsert[0]);
     const keys = columns.join(", ");
@@ -135,7 +136,7 @@ class SqlCrud {
 
     const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
     const result = await connection.query(query, [valuesArray]);
-    console.log("result database 1: ", result);
+    console.log(`result database ${cedi}: `, result);
   }
 
   static async insertOrUpdateBulkCristianDB(

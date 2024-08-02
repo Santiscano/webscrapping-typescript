@@ -215,7 +215,8 @@ class TBPEDIDOSNOVAVENTAModel {
             'Numero_Boleta',
             [
               'Ciudad', 'Seccion', 'Zona', 'Valor_Venta', 'Factura_De_Venta', 'Fecha_De_Venta'
-            ]
+            ],
+            Cedi
           );
         }
         if (fileName == "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO") {
@@ -223,7 +224,8 @@ class TBPEDIDOSNOVAVENTAModel {
             this.tableDevoluciones,
             ExcelWithCedi,
             '',
-            []
+            [],
+            Cedi
           );
         }
         // eliminamos archivos
@@ -240,9 +242,12 @@ class TBPEDIDOSNOVAVENTAModel {
 
 
   // *=============================ACTUALIZAR DATABASE===================== *//
-  static async insertOrUpdateTBPEDIDOSNOVAVENTA( table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [] ) {
+  static async insertOrUpdateTBPEDIDOSNOVAVENTA( 
+    table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [],
+    cedi: number
+  ) {
     const excludeFieldsEControl = [...excludeFields, "Nombre_Plataforma"];
-    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldsEControl );
+    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldsEControl, cedi );
 
     const excludeFieldsCristian = [...excludeFields, "Estado_ans", "Fecha_promesa2", "Estado_promesa" ];
     const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
@@ -250,9 +255,12 @@ class TBPEDIDOSNOVAVENTAModel {
     return { message: "Datos ingresados y actualizados correctamente", data: { res, resCristian } };
   };
 
-  static async insertorUpdateDevolucionesNovaventa( table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [] ) {
+  static async insertorUpdateDevolucionesNovaventa( 
+    table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [],
+    cedi: number
+  ) {
     const excludeFieldDevoluciones = [ ...excludeFields ];
-    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones );
+    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones, cedi );
 
     const excludeFieldsCristian = [ ...excludeFields ];
     const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
