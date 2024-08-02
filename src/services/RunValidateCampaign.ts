@@ -12,20 +12,26 @@ class RunValidateCampaign {
 
   static async bucleValidateCampaign() {
     const listCedis = listCedisActive;
-    console.log('cedis que se van a ejecutar', listCedis);
+    console.log('cedis a ejecutar validacion', listCedis);
     try {
       const runPromises = async () => {
         const newCampaigns = await campaingsModel.getCedis() as CedisRequestType[];
         const campaigns_by_active = newCampaigns.filter(campaignsItem => listCedis.includes(String(campaignsItem.ID)));
         console.log('cedis activos', campaigns_by_active);
         const promises = campaigns_by_active.map(item => this.runForCedi(item));
-        await Promise.allSettled(promises);
+        Promise.allSettled(promises).then(() => {
+          setTimeout(() => {
+            console.log(['ALERT'], 'se esta re-invocando la funcion validacion de campañas');
+            this.bucleValidateCampaign();
+          }, 5 * 60 * 1000); // se ejecuta cada 5 minutos y se llama a si mismo
+        })
       };
       await runPromises(); // se dispara la funcion por cada cedi que haya en la base de datos
     } catch (error) {
       console.error(`fallo la ejecucion de bucleValidateCampaign con error: ${error}`);
     } finally {
-      setTimeout(() => this.bucleValidateCampaign(), 20 * 1000); // se ejecuta cada 20 segundos y se llama a si mismo
+      console.log('llego a finally');
+      setTimeout(() => this.bucleValidateCampaign(), 2 * 60 * 60 * 1000); // se ejecuta cada 2 horas y se llama a si mismo
     }
   }
 

@@ -16,22 +16,40 @@ interface CedisRequestType {
 }
 class RunScrapps {
 
+  // static async bucleScrapp2() {
+  //   const listCedis = listCedisActive;
+  //   console.log('cedis que se van a ejecutar', listCedis);
+  //   try {
+  //     CedisReques.getCedis().then(async (cedis) => {
+  //       // @ts-ignore
+  //       const cedis_by_active = cedis.filter(cedisItem => listCedis.includes(String(cedisItem.ID)));
+  //       console.log('cedis activos', cedis_by_active);
+  //     });
+  //   }
+  // }
+
   static async bucleScrapp() {
     const listCedis = listCedisActive;
-    console.log('cedis que se van a ejecutar', listCedis);
+    console.log('cedis a ejecutar scrapp principal', listCedis);
     try {
       const runPromises = async () => {
         const cedis = await CedisReques.getCedis() as CedisRequestType[];
         const cedis_by_active = cedis.filter(cedisItem => listCedis.includes(String(cedisItem.ID)));
         console.log('cedis activos', cedis_by_active);
         const promises = cedis_by_active.map(cedisItem => this.runForCedi(cedisItem));
-        await Promise.allSettled(promises);
-      }
+        Promise.allSettled(promises).then(() => {
+          setTimeout(() => {
+            console.log(['ALERT'], 'se esta re-invocando la funcion scrapp principal');
+            this.bucleScrapp();
+          }, 5 * 60 * 1000); // se ejecuta cada 5 minutos y se llama a si mismo
+        })
+      };
       await runPromises(); // se disparan la funcion runForCedi la cantidad de cedis que haya en la base de datos
     } catch (error) {
-      console.error(`fallo la ejecucion de runBucleScrapp con error: ${error}`);
+      console.error(`fallo la ejecucion de scrapp principal con error: ${error}`);
     } finally {
-      setTimeout(() => this.bucleScrapp(), 20 * 1000); // se ejecuta cada 20 segundos y se llama a si mismo
+      console.log('llego a finally');
+      // setTimeout(() => this.bucleScrapp(), 5 * 60 * 1000); // se ejecuta cada 20 segundos y se llama a si mismo
     }
   };
 
@@ -75,7 +93,7 @@ class RunScrapps {
       await CedisReques.updatePositionCampaing(newPosition, ID);
       console.log(`termino por completo el scrapping de codigo cedi: ${CEDI_OPTION_CODE}/${campaings[POSITION_CAMPAING]}`,);
     } catch (error) {
-      console.error(`fallo la ejecucion de 4 minutos con error: ${error}`)
+      console.error(`fallo la ejecucion de 4 minutos en cedi: ${CEDI}, con error: ${error}`)
     }
   };
 
