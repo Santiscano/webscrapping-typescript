@@ -23,7 +23,7 @@ class RunValidateCampaign {
           setTimeout(() => {
             console.log(['ALERT'], 'se esta re-invocando la funcion validacion de campañas');
             this.bucleValidateCampaign();
-          }, 5 * 60 * 1000); // se ejecuta cada 5 minutos y se llama a si mismo
+          }, 2 * 60 * 60 * 60 * 1000); // se ejecuta cada 2 horas y se llama a si mismo
         })
       };
       await runPromises(); // se dispara la funcion por cada cedi que haya en la base de datos
