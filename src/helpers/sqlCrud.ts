@@ -22,7 +22,7 @@ class SqlCrud {
   ): Promise<getTable> {
     const [query]: SQLResponse = await connection.query(`
       SELECT * FROM ${table} ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset};`);
-    console.log(query);
+    // console.log(query);
     if (query.lenght === 0) {
       return { status: false, data: query };
     }
@@ -121,7 +121,7 @@ class SqlCrud {
     dataToInsert: Record<string, any>[],
     uniqueKey: string,
     excludeFields: string[] = [],
-    cedi: number
+    cedi: number, campaign: string
   ): Promise<void> {
     const columns = Object.keys(dataToInsert[0]);
     const keys = columns.join(", ");
@@ -136,7 +136,7 @@ class SqlCrud {
 
     const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
     const result = await connection.query(query, [valuesArray]);
-    console.log(`result database ${cedi}: `, result);
+    console.log(`result database ${cedi}/${campaign}: `, result);
   }
 
   static async insertOrUpdateBulkCristianDB(

@@ -47,7 +47,7 @@ class TBPEDIDOSNOVAVENTAModel {
       await page.setRequestInterception(true); // Habilitamos la interceptación de solicitudes
       page.on('request', this.request);
       page.on('response', (response) => this.downloadExcel( 
-        response, browser, fileName, tempDir, Cedi 
+        response, browser, fileName, tempDir, Cedi, campaing
       )); // escuchando evento de descarga
 
       // login
@@ -100,7 +100,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
       await page.setRequestInterception(true);
       page.on('request', this.request);
-      page.on('response', (response) => this.downloadExcel( response, browser, fileName, temDir, Cedi ));
+      page.on('response', (response) => this.downloadExcel( response, browser, fileName, temDir, Cedi, campaing ));
 
       // login
       await page.type('input[name="login"]', login);
@@ -167,7 +167,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async downloadExcel( 
     response: HTTPResponse, browser: Browser, 
-    fileName:string, temDir:string, Cedi:number
+    fileName:string, temDir:string, Cedi:number, campaign: string
   ) {
     const contentDisposition = response.headers()['content-disposition'];
     if ( contentDisposition && contentDisposition.startsWith('attachment') ) {
@@ -176,7 +176,7 @@ class TBPEDIDOSNOVAVENTAModel {
         await this.validateExcelPath(path.join(__dirname, temDir, `${fileName}.xls`), Cedi);
         browser.close();
         // console.log(['SUCCESS'],`se encontro el archivo: ${fileName} cedi: ${Cedi}`);
-        setTimeout(() => this.updateReportDB(fileName, temDir, Cedi), 3000);
+        setTimeout(() => this.updateReportDB(fileName, temDir, Cedi, campaign), 3000);
       }
     };
   };
@@ -195,7 +195,7 @@ class TBPEDIDOSNOVAVENTAModel {
     })
   };
 
-  static async updateReportDB(fileName:string, tempDir:string, Cedi:number) {
+  static async updateReportDB(fileName:string, tempDir:string, Cedi:number, campaign: string) {
     try {
       const filePath = path.join( __dirname, tempDir, `${fileName}.xls` );
       const newFilePath = path.join( __dirname, tempDir, `${fileName.replace(" ", "-")}.xlsx` );
@@ -216,7 +216,8 @@ class TBPEDIDOSNOVAVENTAModel {
             [
               'Ciudad', 'Seccion', 'Zona', 'Valor_Venta', 'Factura_De_Venta', 'Fecha_De_Venta'
             ],
-            Cedi
+            Cedi,
+            campaign
           );
         }
         if (fileName == "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO") {
@@ -225,7 +226,8 @@ class TBPEDIDOSNOVAVENTAModel {
             ExcelWithCedi,
             '',
             [],
-            Cedi
+            Cedi,
+            campaign
           );
         }
         // eliminamos archivos
@@ -244,10 +246,10 @@ class TBPEDIDOSNOVAVENTAModel {
   // *=============================ACTUALIZAR DATABASE===================== *//
   static async insertOrUpdateTBPEDIDOSNOVAVENTA( 
     table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [],
-    cedi: number
+    cedi: number, campaign: string
   ) {
     const excludeFieldsEControl = [...excludeFields, "Nombre_Plataforma"];
-    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldsEControl, cedi );
+    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldsEControl, cedi, campaign );
 
     const excludeFieldsCristian = [...excludeFields, "Estado_ans", "Fecha_promesa2", "Estado_promesa" ];
     const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
@@ -257,10 +259,10 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async insertorUpdateDevolucionesNovaventa( 
     table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [],
-    cedi: number
+    cedi: number, campaign: string
   ) {
     const excludeFieldDevoluciones = [ ...excludeFields ];
-    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones, cedi );
+    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones, cedi, campaign );
 
     const excludeFieldsCristian = [ ...excludeFields ];
     const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
