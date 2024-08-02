@@ -13,8 +13,8 @@ import SQLResponse from "../interfaces/sql2";
 import campaingsModel from './campaings.model';
 
 class TBPEDIDOSNOVAVENTAModel {
-  private static tableName = 'TB_PEDIDOS_NOVAVENTA_TEST';
-  private static tableDevoluciones = 'TB_DEVOLUCIONES_NOVAVENTA_TEST';
+  private static tableName = 'TB_PEDIDOS_NOVAVENTA';
+  private static tableDevoluciones = 'TB_DEVOLUCIONES_NOVAVENTA';
 
   protected static headless: boolean | "new" | undefined = "new";
   protected static configLaunch = { 

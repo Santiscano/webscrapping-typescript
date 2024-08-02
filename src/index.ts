@@ -1,5 +1,5 @@
 import RunScrapps from "./services/RunScrapps";
 import RunValidateCampaign from "./services/RunValidateCampaign";
 
-// RunScrapps.bucleScrapp();
+RunScrapps.bucleScrapp();
 RunValidateCampaign.bucleValidateCampaign();
