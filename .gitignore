@@ -32,4 +32,8 @@ temp/*
 !temp/validate
 temp/validate/*
 !temp/validate/.gitkeep
+!temp/devolutions
+temp/devolutions/*
+!temp/devolutions/.gitkeep
+
 keys/*

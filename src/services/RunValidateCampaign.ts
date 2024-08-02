@@ -1,6 +1,6 @@
 import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
 import campaingsModel from "../models/cedis.model";
-import { FIRST_CEDI, SECOND_CEDI, THIRD_CEDI } from "../config/configPorts";
+import { listCedisActive } from '../config/ListCedisActive';
 
 interface CedisRequestType {
   ID: number;
@@ -11,12 +11,13 @@ interface CedisRequestType {
 class RunValidateCampaign {
 
   static async bucleValidateCampaign() {
-    // const listCedisActive = [ FIRST_CEDI, SECOND_CEDI, THIRD_CEDI ];
-    const listCedisActive = [ FIRST_CEDI ];
+    const listCedis = listCedisActive;
+    console.log('cedis que se van a ejecutar', listCedis);
     try {
       const runPromises = async () => {
         const newCampaigns = await campaingsModel.getCedis() as CedisRequestType[];
-        const campaigns_by_active = newCampaigns.filter(campaignsItem => listCedisActive.includes(String(campaignsItem.ID)));
+        const campaigns_by_active = newCampaigns.filter(campaignsItem => listCedis.includes(String(campaignsItem.ID)));
+        console.log('cedis activos', campaigns_by_active);
         const promises = campaigns_by_active.map(item => this.runForCedi(item));
         await Promise.allSettled(promises);
       };
@@ -31,6 +32,9 @@ class RunValidateCampaign {
   static async runForCedi({ NEW_CAMPAING, CEDI_OPTION_CODE, ID }: CedisRequestType) {
     try {
       await WebScrapping.validateNewCampaing(NEW_CAMPAING, CEDI_OPTION_CODE, ID);
+
+      await new Promise(resolve => setTimeout(resolve, 12 * 60 * 60 * 1000)); // se ejecuta cada 12 horas
+      console.log('termino por completo la validacion la nueva campaña');
     } catch (error) {
       console.error(`fallo la ejecucion de runForCedi con error: ${error}`);
     }

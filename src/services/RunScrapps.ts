@@ -1,6 +1,6 @@
-import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
+import { listCedisActive } from "../config/ListCedisActive";
 import CedisReques from "../models/cedis.model";
-import { FIRST_CEDI, SECOND_CEDI, THIRD_CEDI } from '../config/configPorts';
+import WebScrapping from "../models/TBPEDIDOSNOVAVENTA.model";
 
 interface CedisRequestType {
   ID:number,
@@ -17,13 +17,13 @@ interface CedisRequestType {
 class RunScrapps {
 
   static async bucleScrapp() {
-    // const listCedisActive = [ FIRST_CEDI, SECOND_CEDI, THIRD_CEDI ];
-    const listCedisActive = [ FIRST_CEDI ];
-    console.log('cedis que se van a ejecutar', listCedisActive);
+    const listCedis = listCedisActive;
+    console.log('cedis que se van a ejecutar', listCedis);
     try {
       const runPromises = async () => {
         const cedis = await CedisReques.getCedis() as CedisRequestType[];
-        const cedis_by_active = cedis.filter(cedisItem => listCedisActive.includes(String(cedisItem.ID)));
+        const cedis_by_active = cedis.filter(cedisItem => listCedis.includes(String(cedisItem.ID)));
+        console.log('cedis activos', cedis_by_active);
         const promises = cedis_by_active.map(cedisItem => this.runForCedi(cedisItem));
         await Promise.allSettled(promises);
       }
@@ -42,7 +42,7 @@ class RunScrapps {
     try {
       if ( POSITION_CAMPAING >= 3 ) {
         POSITION_CAMPAING = 0 // convertirlo aqui
-        CedisReques.updatePositionCampaing(0, ID); // actualizar valor en base de datos
+        await CedisReques.updatePositionCampaing(0, ID); // actualizar valor en base de datos
       }
       
       const campaings = [ CURRENT_CAMPAING, PREVIOUS_CAMPAING, SECOND_PREVIOUS_CAMPAING ];
@@ -68,8 +68,12 @@ class RunScrapps {
         CEDI
       );
 
+      // esperar 5 minutos para ejecutar el siguiente scrapping
+      await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
+
       const newPosition = POSITION_CAMPAING + 1;
       await CedisReques.updatePositionCampaing(newPosition, ID);
+      console.log(`termino por completo el scrapping de codigo cedi: ${CEDI_OPTION_CODE}/${campaings[POSITION_CAMPAING]}`,);
     } catch (error) {
       console.error(`fallo la ejecucion de 4 minutos con error: ${error}`)
     }

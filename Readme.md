@@ -1,3 +1,6 @@
+### 1-DEFINIR LA LISTA DE CAMPAÑAS
+En el archivo config/ListCedisActive.ts se encuentra el array con la lista de cedis a ejecutar, este es el archivo a configurar junto con el .env
+
 ### 1-construir la imagen
 ```bash
 docker build -t novaventa-scrapping .

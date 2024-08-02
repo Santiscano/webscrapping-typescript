@@ -27,14 +27,18 @@ class Cedis {
     return data;
   }
 
-  static async updateNewCampaigns(newCampaign: string, ID: number) {
+  static async updateNewCampaigns(ID: number) {
     const [result] = await connection.query(
       `
       UPDATE ${this.table}
-      SET NEW_CAMPAING = ?
+      SET 
+        SECOND_PREVIOUS_CAMPAING = LPAD(CAST(CAST(SECOND_PREVIOUS_CAMPAING AS UNSIGNED) + 1 AS CHAR), LENGTH(SECOND_PREVIOUS_CAMPAING), '0'),
+        PREVIOUS_CAMPAING = LPAD(CAST(CAST(PREVIOUS_CAMPAING AS UNSIGNED) + 1 AS CHAR), LENGTH(PREVIOUS_CAMPAING), '0'),
+        CURRENT_CAMPAING = LPAD(CAST(CAST(CURRENT_CAMPAING AS UNSIGNED) + 1 AS CHAR), LENGTH(CURRENT_CAMPAING), '0'),
+        NEW_CAMPAING = LPAD(CAST(CAST(NEW_CAMPAING AS UNSIGNED) + 1 AS CHAR), LENGTH(NEW_CAMPAING), '0')
       WHERE ID = ?
       `,
-      [newCampaign, ID]
+      [ID]
     );
     return result;
   }
