@@ -79,7 +79,8 @@ class RunScrapps {
       // await new Promise(resolve => setTimeout(resolve, this.timeInterval));
 
       const newPosition = POSITION_CAMPAING + 1;
-      await CedisReques.updatePositionCampaing(newPosition, ID);
+      const updatePositionCampaign = await CedisReques.updatePositionCampaing(newPosition, ID);
+      console.log('se actualizo la posicion de la camapaña', updatePositionCampaign);
       console.log(`termino por completo el scrapping de codigo cedi: ${CEDI_OPTION_CODE}/${campaings[POSITION_CAMPAING]}`,);
     } catch (error) {
       console.error(`fallo la ejecucion de 4 minutos en cedi: ${CEDI}, con error: ${error}`)
