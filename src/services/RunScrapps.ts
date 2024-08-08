@@ -58,6 +58,7 @@ class RunScrapps {
       }
       
       const campaings = [ CURRENT_CAMPAING, PREVIOUS_CAMPAING, SECOND_PREVIOUS_CAMPAING ];
+      console.log('cedi: ', CEDI, ', posicion campaña', POSITION_CAMPAING, ', campaña: ', campaings[POSITION_CAMPAING]);
 
       /**
        * Scrapping principal de descarga de archivo de reportes general de operacion
