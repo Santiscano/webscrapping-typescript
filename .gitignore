@@ -1,6 +1,7 @@
 # dotenv environment variables file
 .env
 .env.test
+clase-metodologias-agiles.txt
 
 # Logs
 *.log

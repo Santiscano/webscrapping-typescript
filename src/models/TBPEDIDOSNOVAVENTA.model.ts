@@ -249,10 +249,14 @@ class TBPEDIDOSNOVAVENTAModel {
     cedi: number, campaign: string
   ) {
     const excludeFieldsEControl = [...excludeFields, "Nombre_Plataforma"];
-    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldsEControl, cedi, campaign );
+    const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( 
+      table, bulkDataIsert, uniquekey, excludeFieldsEControl, cedi, campaign 
+    );
 
     const excludeFieldsCristian = [...excludeFields, "Estado_ans", "Fecha_promesa2", "Estado_promesa" ];
-    const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
+    const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( 
+      table, bulkDataIsert, uniquekey, excludeFieldsCristian, cedi, campaign
+    );
 
     return { message: "Datos ingresados y actualizados correctamente", data: { res, resCristian } };
   };
@@ -265,7 +269,9 @@ class TBPEDIDOSNOVAVENTAModel {
     const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones, cedi, campaign );
 
     const excludeFieldsCristian = [ ...excludeFields ];
-    const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( table, bulkDataIsert, uniquekey, excludeFieldsCristian );
+    const resCristian: SQLResponse = await SqlCrud.insertOrUpdateBulkCristianDB( 
+      table, bulkDataIsert, uniquekey, excludeFieldsCristian, cedi, campaign
+    );
 
     return { message: "Datos ingresados y actualizados correctamente", data: { res, resCristian }};
   }

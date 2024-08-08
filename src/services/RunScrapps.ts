@@ -18,6 +18,11 @@ class RunScrapps {
 
   static timeInterval = 7 * 60 * 1000;
 
+  static async getCedis() {
+    const cedis = await CedisReques.getCedis() as CedisRequestType[];
+    return cedis;
+  };
+
   static async bucleScrapp() {
     const listCedis = listCedisActive;
     // console.log('cedis a ejecutar scrapp principal', listCedis);
@@ -75,12 +80,9 @@ class RunScrapps {
         CEDI
       );
 
-      // esperar 5 minutos para ejecutar el siguiente scrapping
-      // await new Promise(resolve => setTimeout(resolve, this.timeInterval));
-
       const newPosition = POSITION_CAMPAING + 1;
-      const updatePositionCampaign = await CedisReques.updatePositionCampaing(newPosition, ID);
-      console.log('se actualizo la posicion de la camapaña', updatePositionCampaign);
+      await CedisReques.updatePositionCampaing(newPosition, ID);
+      console.log(`se actualizo la posicion de la camapaña ${CEDI}/${campaings[POSITION_CAMPAING]} a ${CEDI}/${campaings[newPosition]}`);
       console.log(`termino por completo el scrapping de codigo cedi: ${CEDI_OPTION_CODE}/${campaings[POSITION_CAMPAING]}`,);
     } catch (error) {
       console.error(`fallo la ejecucion de 4 minutos en cedi: ${CEDI}, con error: ${error}`)

@@ -143,7 +143,8 @@ class SqlCrud {
     tableName: string,
     dataToInsert: Record<string, any>[],
     uniqueKey: string,
-    excludeFields: string[] = []
+    excludeFields: string[] = [],
+    cedi: number, campaign: string
   ): Promise<void> {
     const batchSize = dataToInsert.length;
     for (let i = 0; i < dataToInsert.length; i += batchSize) {
@@ -165,7 +166,7 @@ class SqlCrud {
       const resultCristian = await connectionCristianBD.query(query, [
         valuesArray,
       ]);
-      console.log("resultCristian: ", resultCristian);
+      console.log(`resultCristian database ${cedi}/${campaign}: `, resultCristian);
     }
   }
 
