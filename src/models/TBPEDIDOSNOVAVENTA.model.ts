@@ -75,6 +75,8 @@ class TBPEDIDOSNOVAVENTAModel {
       console.log(['SCRAPPING'], `se dio click a descargar reporte ${codeCedi}/${campaing}`);
     } catch (error) {
       throw new Error(`no se termino el scrapping por el error: ${error}`);
+    } finally {
+
     }
   };
   // *=============================DEVOLUCIONES=========================== *//
@@ -127,6 +129,10 @@ class TBPEDIDOSNOVAVENTAModel {
       // console.log(['DEVOLUCIONES'], `se dio click a descargar reporte devoluciones ${codeCedi}/${campaing}`);
     } catch (error) {
       throw new Error(`no se termino el scrapping por el error: ${error}`);
+    } finally {
+      setTimeout(() => {
+        console.log('termino el scrapping de devoluciones de cedi: ', Cedi);
+      }, 5 * 60 * 1000); // 5 minutos
     }
   };
 

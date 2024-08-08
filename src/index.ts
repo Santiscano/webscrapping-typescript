@@ -23,9 +23,11 @@ function calculateIntervals(numItems: number): number[] {
 function scheduleCrons(listCedisActive: any[]) {
   const intervals = calculateIntervals(listCedisActive.length);
   console.log('Intervals:', intervals);
+  listCedisActive.push(...listCedisActive); // Duplicar la lista para ejecutar en dos mitades de la hora
 
   intervals.forEach((minute, index) => {
     cron.schedule(`${minute} * * * *`, () => {
+      console.log('index:', index, 'minute:', minute, 'listCedisActive:', listCedisActive[index]);
       console.log(`Ejecutando tarea para CEDI ${JSON.stringify(listCedisActive[index])}`);
       RunScrapps.runForCedi(listCedisActive[index]);
       RunValidateCampaign.runForCedi(listCedisActive[index]);
@@ -35,7 +37,6 @@ function scheduleCrons(listCedisActive: any[]) {
 
 async function startScrapp() {
   const listCedisActive = await RunScrapps.getCedis(); // Obtener la lista de CEDIS activos
-  console.log("Cantidad de CEDIS activos:", listCedisActive.length);
   
   // Limpiar tareas cron previas
   cron.getTasks().forEach((task) => task.stop());
