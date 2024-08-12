@@ -36,6 +36,7 @@ function scheduleCrons(listCedisActive: any[]) {
 }
 
 async function startScrapp() {
+  console.log('se inicia el startScrapp');
   const listCedisActive = await RunScrapps.getCedis(); // Obtener la lista de CEDIS activos
   
   // Limpiar tareas cron previas

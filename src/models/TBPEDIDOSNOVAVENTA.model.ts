@@ -75,8 +75,6 @@ class TBPEDIDOSNOVAVENTAModel {
       console.log(['SCRAPPING'], `se dio click a descargar reporte ${codeCedi}/${campaing}`);
     } catch (error) {
       throw new Error(`no se termino el scrapping por el error: ${error}`);
-    } finally {
-
     }
   };
   // *=============================DEVOLUCIONES=========================== *//
