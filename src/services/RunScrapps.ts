@@ -47,7 +47,7 @@ class RunScrapps {
     }
   };
 
-  static async runForCedi({ ID, CEDI_OPTION_CODE, CEDI,
+  static async runForCedi({ ID, SCRAP_NAME, CEDI_OPTION_CODE, CEDI,
     CURRENT_CAMPAING, PREVIOUS_CAMPAING, SECOND_PREVIOUS_CAMPAING, 
     POSITION_CAMPAING 
   }: CedisRequestType) {
@@ -67,7 +67,8 @@ class RunScrapps {
         campaings[POSITION_CAMPAING], // camapaña a descargar
         String(CEDI_OPTION_CODE), // cedi a descargar
         "REPORTE GENERAL DE OPERACION", // nombre del archivo
-        CEDI // cedi a descargar
+        CEDI, // cedi a descargar
+        SCRAP_NAME
       );
 
       /**
@@ -78,7 +79,8 @@ class RunScrapps {
         campaings[POSITION_CAMPAING],
         String(CEDI_OPTION_CODE),
         "REPORTE GENERAL OPERACION DEVOLUCIONES NOVAVENTA SCO",
-        CEDI
+        CEDI,
+        SCRAP_NAME
       );
 
       const newPosition = POSITION_CAMPAING + 1;

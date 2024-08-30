@@ -121,7 +121,7 @@ class SqlCrud {
     dataToInsert: Record<string, any>[],
     uniqueKey: string,
     excludeFields: string[] = [],
-    cedi: number, campaign: string
+    cedi: string, campaign: string
   ): Promise<void> {
     const columns = Object.keys(dataToInsert[0]);
     const keys = columns.join(", ");
@@ -136,7 +136,10 @@ class SqlCrud {
 
     const query = `INSERT INTO ${tableName} (${keys}) VALUES ? ON DUPLICATE KEY UPDATE ${updateSet}`;
     const result = await connection.query(query, [valuesArray]);
-    console.log(`result database ${cedi}/${campaign}: `, result);
+    console.log(`DB Novaventa: ${cedi}/${campaign}: `, result);
+
+    const queryLog = `INSERT INTO LOGS (fecha_hora, name, result) VALUES (NOW(), 'insert Webscrapping DB Novaventa', '${JSON.stringify(result)}')`;
+    await connection.query(queryLog);
   }
 
   static async insertOrUpdateBulkCristianDB(
@@ -144,9 +147,10 @@ class SqlCrud {
     dataToInsert: Record<string, any>[],
     uniqueKey: string,
     excludeFields: string[] = [],
-    cedi: number, campaign: string
+    cedi: string, campaign: string
   ): Promise<void> {
     const batchSize = dataToInsert.length;
+    let log = "DB Informes: ";
     for (let i = 0; i < dataToInsert.length; i += batchSize) {
       console.log("i: ", i);
       const batch = dataToInsert.slice(i, i + batchSize);
@@ -166,8 +170,11 @@ class SqlCrud {
       const resultCristian = await connectionCristianBD.query(query, [
         valuesArray,
       ]);
-      console.log(`resultCristian database ${cedi}/${campaign}: `, resultCristian);
+      console.log(`DB Informes: ${cedi}/${campaign}: `, resultCristian);
+      log += resultCristian;
     }
+    const queryLog = `INSERT INTO LOGS (fecha_hora, name, result) VALUES (NOW(), 'insert Webscrapping DB Informes', '${JSON.stringify(log)}')`;
+    await connectionCristianBD.query(queryLog);
   }
 
   /**

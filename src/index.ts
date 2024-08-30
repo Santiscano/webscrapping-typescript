@@ -7,7 +7,7 @@ import RunValidateCampaign from "./services/RunValidateCampaign";
 function calculateIntervals(numItems: number): number[] {
   const interval = Math.floor(30 / numItems); // Calcular el intervalo en minutos
   const intervals = [];
-  
+
   for (let i = 0; i < numItems; i++) {
     intervals.push(i * interval + 1); // +1 para evitar ejecutar en el minuto 0
   }

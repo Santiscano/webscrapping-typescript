@@ -24,8 +24,8 @@ class TBPEDIDOSNOVAVENTAModel {
   };
 
   // *===========================SCRAPPING BASE=========================== *//
-  static async getCampaingsNovaventaModel(campaing:string, codeCedi:string, fileName:string, Cedi:number) {
-    console.log(['SCRAPPING'], `inicia scrapping de ${codeCedi}/${campaing} - cedi: ${Cedi}`);
+  static async getCampaingsNovaventaModel(campaing:string, codeCedi:string, fileName:string, Cedi:number, cediName:string) {
+    console.log(['SCRAPPING'], `inicia scrapping de ${cediName}/codigoNV:${codeCedi}/campaing${campaing} - cedi: ${Cedi}`);
     const tempDir = `../../temp/${codeCedi}/${campaing}`;
     const { login, password } = requestData.body;
 
@@ -47,7 +47,7 @@ class TBPEDIDOSNOVAVENTAModel {
       await page.setRequestInterception(true); // Habilitamos la interceptación de solicitudes
       page.on('request', this.request);
       page.on('response', (response) => this.downloadExcel( 
-        response, browser, fileName, tempDir, Cedi, campaing
+        response, browser, fileName, tempDir, Cedi, cediName, campaing
       )); // escuchando evento de descarga
 
       // login
@@ -78,7 +78,7 @@ class TBPEDIDOSNOVAVENTAModel {
     }
   };
   // *=============================DEVOLUCIONES=========================== *//
-  static async NoveltyNovaventaModel(campaing:string, codeCedi:string, fileName:string, Cedi:number) {
+  static async NoveltyNovaventaModel(campaing:string, codeCedi:string, fileName:string, Cedi:number, cediName:string) {
     console.log(['DEVOLUCIONES'], `inicia scrapping de devoluciones de ${codeCedi}/${campaing} - cedi: ${Cedi}`);
     const temDir = `../../temp/devolutions/${codeCedi}/${campaing}`;
     const { login, password } = requestData.body;
@@ -100,7 +100,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
       await page.setRequestInterception(true);
       page.on('request', this.request);
-      page.on('response', (response) => this.downloadExcel( response, browser, fileName, temDir, Cedi, campaing ));
+      page.on('response', (response) => this.downloadExcel( response, browser, fileName, temDir, Cedi, cediName, campaing ));
 
       // login
       await page.type('input[name="login"]', login);
@@ -171,7 +171,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async downloadExcel( 
     response: HTTPResponse, browser: Browser, 
-    fileName:string, temDir:string, Cedi:number, campaign: string
+    fileName:string, temDir:string, Cedi:number, cediName:string, campaign: string
   ) {
     const contentDisposition = response.headers()['content-disposition'];
     if ( contentDisposition && contentDisposition.startsWith('attachment') ) {
@@ -180,7 +180,7 @@ class TBPEDIDOSNOVAVENTAModel {
         await this.validateExcelPath(path.join(__dirname, temDir, `${fileName}.xls`), Cedi);
         browser.close();
         // console.log(['SUCCESS'],`se encontro el archivo: ${fileName} cedi: ${Cedi}`);
-        setTimeout(() => this.updateReportDB(fileName, temDir, Cedi, campaign), 3000);
+        setTimeout(() => this.updateReportDB(fileName, temDir, Cedi, cediName, campaign), 3000);
       }
     };
   };
@@ -199,7 +199,7 @@ class TBPEDIDOSNOVAVENTAModel {
     })
   };
 
-  static async updateReportDB(fileName:string, tempDir:string, Cedi:number, campaign: string) {
+  static async updateReportDB(fileName:string, tempDir:string, Cedi:number, cediName:string, campaign: string) {
     try {
       const filePath = path.join( __dirname, tempDir, `${fileName}.xls` );
       const newFilePath = path.join( __dirname, tempDir, `${fileName.replace(" ", "-")}.xlsx` );
@@ -212,7 +212,6 @@ class TBPEDIDOSNOVAVENTAModel {
 
       if (Array.isArray(ArrayExcel) && ArrayExcel.every(item => typeof item === 'object') ) {
         if (fileName === "REPORTE GENERAL DE OPERACION") {
-          // console.log(`inicia proceso de insert de cedi ${Cedi} a las: `, Date.now());
           const insertUpdateData = await TBPEDIDOSNOVAVENTAModel.insertOrUpdateTBPEDIDOSNOVAVENTA( 
             this.tableName,
             ExcelWithCedi,
@@ -220,7 +219,7 @@ class TBPEDIDOSNOVAVENTAModel {
             [
               'Ciudad', 'Seccion', 'Zona', 'Valor_Venta', 'Factura_De_Venta', 'Fecha_De_Venta'
             ],
-            Cedi,
+            cediName,
             campaign
           );
         }
@@ -230,7 +229,7 @@ class TBPEDIDOSNOVAVENTAModel {
             ExcelWithCedi,
             '',
             [],
-            Cedi,
+            cediName,
             campaign
           );
         }
@@ -250,7 +249,7 @@ class TBPEDIDOSNOVAVENTAModel {
   // *=============================ACTUALIZAR DATABASE===================== *//
   static async insertOrUpdateTBPEDIDOSNOVAVENTA( 
     table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [],
-    cedi: number, campaign: string
+    cedi: string, campaign: string
   ) {
     const excludeFieldsEControl = [...excludeFields, "Nombre_Plataforma"];
     const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( 
@@ -267,7 +266,7 @@ class TBPEDIDOSNOVAVENTAModel {
 
   static async insertorUpdateDevolucionesNovaventa( 
     table:string, bulkDataIsert: Record<string, any>[] , uniquekey:string, excludeFields: string[] = [],
-    cedi: number, campaign: string
+    cedi: string, campaign: string
   ) {
     const excludeFieldDevoluciones = [ ...excludeFields ];
     const res: SQLResponse = await SqlCrud.insertOrUpdateBulk( table, bulkDataIsert, uniquekey, excludeFieldDevoluciones, cedi, campaign );
@@ -282,8 +281,8 @@ class TBPEDIDOSNOVAVENTAModel {
 
 
   // !=============================SIN ACTUALIZAR:VALIDAR NUEVA CAMPAÑA===================== *//
-  static async validateNewCampaing( campaingValidate:string, codeCedi:string, id:number, fileName = "REPORTE GENERAL DE OPERACION") {
-    console.log(['VALIDATE NEW CAMPAIGN', `${codeCedi}/${campaingValidate}`]);
+  static async validateNewCampaing( campaingValidate:string, codeCedi:string, id:number, cediName:string, fileName = "REPORTE GENERAL DE OPERACION") {
+    console.log(['VALIDATE NEW CAMPAIGN', `${cediName}/${codeCedi}/${campaingValidate}`]);
     let isPageForm = false;
     const temDir = `../../temp/validate/${codeCedi}/${campaingValidate}`;
     const { login, password } = requestData.body;
@@ -313,7 +312,7 @@ class TBPEDIDOSNOVAVENTAModel {
       ));
       page.on( 'load', () => {
         if (isPageForm) {
-          console.log(['WARNING'], 'no hay datos para esta campaña');
+          console.log(['WARNING'], `no hay datos para la campaña ${cediName}/${campaingValidate}`);
           browser.close();
         } else {
           console.log(['ERROR'], 'No se llego hasta el formulario');

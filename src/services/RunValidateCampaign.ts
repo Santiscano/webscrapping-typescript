@@ -4,6 +4,7 @@ import { listCedisActive } from '../config/ListCedisActive';
 
 interface CedisRequestType {
   ID: number;
+  SCRAP_NAME: string;
   NEW_CAMPAING: string;
   CEDI_OPTION_CODE:string;
 }
@@ -37,9 +38,9 @@ class RunValidateCampaign {
     }
   }
 
-  static async runForCedi({ NEW_CAMPAING, CEDI_OPTION_CODE, ID }: CedisRequestType) {
+  static async runForCedi({ NEW_CAMPAING, CEDI_OPTION_CODE, ID, SCRAP_NAME }: CedisRequestType) {
     try {
-      await WebScrapping.validateNewCampaing(NEW_CAMPAING, CEDI_OPTION_CODE, ID);
+      await WebScrapping.validateNewCampaing(NEW_CAMPAING, CEDI_OPTION_CODE, ID, SCRAP_NAME);
 
       await new Promise(resolve => setTimeout(resolve, this.timeInterval)); // se ejecuta cada 12 horas
       // console.log('termino por completo la validacion la nueva campaña');
